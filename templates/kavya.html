@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Suggestions Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .suggestions {
+            border-top: 2px solid black;
+            max-height: 400px; /* Increased max-height for larger scroll area */
+            overflow-y: auto; /* Enable vertical scrolling */
+            width: 100%;
+            text-align: left;
+            background-color: #f9f9f9;
+            position: absolute; /* Position it absolutely if needed */
+            z-index: 1000; /* Ensure it appears above other content */
+        }
+
+        .suggestions div {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .suggestions div:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <input type="text" id="searchInput" placeholder="Search..." />
+    <div class="suggestions" id="suggestions">
+        <!-- Suggestions will be dynamically inserted here -->
+    </div>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            let query = this.value;
+            if (query.length > 0) {
+                fetchSuggestions(query).then(suggestions => {
+                    let suggestionsContainer = document.getElementById('suggestions');
+                    suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+                    suggestions.forEach(suggestion => {
+                        let suggestionDiv = document.createElement('div');
+                        suggestionDiv.textContent = suggestion;
+                        suggestionDiv.addEventListener('click', function() {
+                            // Handle suggestion click
+                            document.getElementById('searchInput').value = suggestion;
+                            suggestionsContainer.innerHTML = '';
+                        });
+                        suggestionsContainer.appendChild(suggestionDiv);
+                    });
+                });
+            } else {
+                document.getElementById('suggestions').innerHTML = ''; // Clear suggestions if input is empty
+            }
+        });
+
+        function fetchSuggestions(query) {
+            // Dummy function to simulate fetching suggestions from a server
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const suggestionsList = [
+                        'Apple',
+                        'Banana',
+                        'Cherry',
+                        'Date',
+                        'Elderberry',
+                        'Fig',
+                        'Grape',
+                        'Honeydew',
+                        'Ice cream',
+                        'Jackfruit',
+                        'Kiwi',
+                        'Lemon',
+                        'Mango',
+                        'Nectarine',
+                        'Orange',
+                        'Papaya',
+                        'Quince',
+                        'Raspberry',
+                        'Strawberry',
+                        'Tomato',
+                        'Ugli fruit',
+                        'Vanilla',
+                        'Watermelon',
+                        'Xigua',
+                        'Yellow watermelon',
+                        'Zucchini'
+                    ];
+                    // Filter suggestions based on the query, supporting compound search terms
+                    resolve(suggestionsList.filter(item => item.toLowerCase().includes(query.toLowerCase())));
+                }, 200);
+            });
+        }
+    </script>
+</body>
+</html>

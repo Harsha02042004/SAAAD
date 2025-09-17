@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAACD - Sialic Acid Analogues</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/s.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="navbar">
+        <div class="icon">
+            <h2 class="logo"><b>SAACD</b></h2>
+        </div>
+        <div class="container">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <!-- Navigation items here -->
+            </ul>
+        </div>
+    </div>
+
+    <div class="text-box">
+        <h2>Sialic Acid Analogues</h2>
+        <h3>Carbohydrate Database with ADME Properties</h3>
+    </div>
+
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <p>Home content</p>
+        </div>
+        <div class="tab-pane fade" id="Search" role="tabpanel" aria-labelledby="Search-tab">
+            <h2><br><center><b>Search the sialic acid</b></center></h2><br>
+            <div class="search-box">
+                <input type="text" id="search-input" list="searchitem" placeholder="Search for an item..." onkeyup="performSearch()">
+                <span class="clear-btn" onclick="clearSearch()">&#10006;</span>
+                <button class="search-btn" onclick="searchItem()">Search</button>
+            </div>
+            <div id="suggestions" class="suggestions"></div> <br>
+            <div id="result-container" class="result-container"></div>
+        </div>
+        <!-- Other tab panes here -->
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
