@@ -8,7 +8,7 @@ app = Flask(__name__)
 # --- Base Directories ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGE_DIR = os.path.join(BASE_DIR, "static", "compound_images")
-DOWNLOAD_DIR = os.path.join(BASE_DIR, "sialic_acid_analog")
+DOWNLOAD_DIR = os.path.join(BASE_DIR, "sialic acid analog")  # folder in root
 
 # --- Load Excel dataset ---
 data_file = os.path.join(BASE_DIR, "descriptions.xlsx")  # file in root
@@ -59,8 +59,10 @@ def search():
     suggestions = [result["Sialic acid analogues"] for result in results_dict]
     return jsonify({"results": results_dict, "suggestions": suggestions})
 
+# --- Download MOL file route ---
 @app.route("/download/<filename>")
 def download_file(filename):
+    # Ensure safe path join for cloud deployment
     file_path = os.path.join(DOWNLOAD_DIR, filename)
     if not os.path.exists(file_path):
         return jsonify({"error": "File not found"}), 404
