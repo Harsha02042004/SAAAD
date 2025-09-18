@@ -360,52 +360,8 @@ textarea {
     to {
         opacity: 1;
     }
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px; /* space between cards */
-}
+</style>
 
-.col-md-6 {
-    display: flex;
-    justify-content: center;
-}
-
-.card-custom {
-    width: 100%;
-    max-width: 350px; /* card width */
-    display: flex;
-    flex-direction: column;
-    height: 450px; /* fixed height for all cards */
-}
-
-.card-custom img {
-    height: 200px; /* fixed image height */
-    object-fit: cover;
-}
-
-.card-body {
-    flex: 1; /* fill remaining space */
-    overflow: hidden; /* hide overflow text if too long */
-}
-
-.card-body h5 {
-    font-size: 1.2rem;
-}
-
-.card-body p {
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-}
-
-@media (max-width: 768px) {
-    .card-custom {
-        max-width: 100%;
-        height: auto; /* allow auto height on small screens */
-    }
-}
-    </style>
 </head>
 
 <body>
@@ -662,6 +618,8 @@ textarea {
         </div>
     </div>
 
+
+
     <script>
         // JavaScript for search functionality
         function fetchSuggestions() {
@@ -712,7 +670,7 @@ textarea {
             results.forEach(result => {
                 const resultDiv = document.createElement('div');
                 resultDiv.classList.add('result');
-                resultDiv.innerHTML = `<h3>${result['Sialic acid analogues']}${result['Image'] ? `<img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compund_name">` : ''}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" download>Download .mol file</a>`;
+                resultDiv.innerHTML = `<h3>${result['Sialic acid analogues']}${result['Image'] ? <img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compund_name"> : ''}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" download>Download .mol file</a>`;
                 resultsContainer.appendChild(resultDiv);
             });
         }
@@ -745,11 +703,11 @@ textarea {
                             data.results.forEach(result => {
                                 var div = document.createElement('div');
                                 div.classList.add('result');
-                                div.innerHTML = `<h3>${result['Sialic acid analogues']}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" class="download-btn">Download .mol file</a>`;
+                                div.innerHTML = <h3>${result['Sialic acid analogues']}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" class="download-btn">Download .mol file</a>;
 								resultContainer.appendChild(div);
                             });
                         } else {
-                            resultContainer.innerHTML = `<p>No results found.</p>`;
+                            resultContainer.innerHTML = <p>No results found.</p>;
                         }
                     });
             }
