@@ -360,6 +360,51 @@ textarea {
     to {
         opacity: 1;
     }
+<style>
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px; /* space between cards */
+}
+
+.col-md-6 {
+    display: flex;
+    justify-content: center;
+}
+
+.card-custom {
+    width: 100%;
+    max-width: 350px; /* card width */
+    display: flex;
+    flex-direction: column;
+    height: 450px; /* fixed height for all cards */
+}
+
+.card-custom img {
+    height: 200px; /* fixed image height */
+    object-fit: cover;
+}
+
+.card-body {
+    flex: 1; /* fill remaining space */
+    overflow: hidden; /* hide overflow text if too long */
+}
+
+.card-body h5 {
+    font-size: 1.2rem;
+}
+
+.card-body p {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .card-custom {
+        max-width: 100%;
+        height: auto; /* allow auto height on small screens */
+    }
 }
     </style>
 </head>
@@ -540,68 +585,85 @@ textarea {
 
 <div class="tab-pane fade" id="Contact" role="tabpanel" aria-labelledby="Contact-tab">
     <div class="container mt-5">
-        <!-- First Image and Details -->
+
+        <!-- First Row: Large single image -->
         <div class="row justify-content-center mb-5">
-            <div class="col-md-8 d-flex justify-content-center">
-                <div class="card card-custom">
-                    <img src="{{ url_for('static', filename='images/image1.jpeg') }}" alt="Top Image" class="img-fluid">
+            <div class="col-md-8">
+                <div class="card card-custom text-center">
+                    <img src="{{ url_for('static', filename='images/image1.jpeg') }}" class="img-fluid" alt="Top Contact Image">
                     <div class="card-body">
-                        <h5 class="card-title"><b>Dr. J Jino Blessy</b></h5>
-                        <h5>Assistant Professor</h5>
-                        <p>Department of Bioinformatics <br> Sri Ramachandra Institute of Higher Education and Research<br>
-                            <b>Email: </b>
-                            <a href="mailto:jinoblessy@sret.edu.in">jinoblessy@sret.edu.in</a> <br>
-                            <a href="mailto:jinoblessy@sriramachandra.edu.in">jinoblessy@sriramachandra.edu.in</a><br>
-                            <a href="mailto:blessyjino@gmail.com">blessyjino@gmail.com</a>
-                        </p>
+                        <h5><b>Dr. J Jino Blessy</b></h5>
+                        <p>Assistant Professor<br>Department of Bioinformatics<br>Sri Ramachandra Institute of Higher Education and Research</p>
+                        <b>Email:</b><br>
+                        <a href="mailto:jinoblessy@sret.edu.in">jinoblessy@sret.edu.in</a><br>
+                        <a href="mailto:jinoblessy@sriramachandra.edu.in">jinoblessy@sriramachandra.edu.in</a><br>
+                        <a href="mailto:blessyjino@gmail.com">blessyjino@gmail.com</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 3 Images and Details Below -->
-        <div class="row justify-content-center">
-            <!-- First Image -->
-            <div class="col-sm-4 mb-4">
-                <div class="card card-custom">
-                    <img src="{{ url_for('static', filename='images/image2.jpeg') }}" class="card-img-top" alt="Image 1">
-                    <div class="card-body">
-                        <h5 class="card-title"><b>Khambham Chethana</b></h5>
-                        <p>B.Sc Bioinformatics <br>Department of Bioinformatics <br>Sri Ramachandra Faculty of Engineering and Technology<br> Sri Ramachandra Institute of Higher Education and Research</p>
-                        <b>Email: </b><a href="mailto:e6122001@sret.edu.in">e6122001@sret.edu.in</a><br>
-                        <a href="mailto:khambhamchethanareddy17@gmail.com">khambhamchethanareddy17@gmail.com</a>
-                    </div>
-                </div>
+        
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card card-custom text-center">
+            <img src="{{ url_for('static', filename='images/image2.jpg') }}" class="card-img-top" alt="Contact 1">
+            <div class="card-body">
+                <h5><b>C. Kavya Sree</b></h5>
+                <p>B.Sc Bioinformatics <br> Department of Bioinformatics<br> Sri Ramachandra Faculty of Engineering and Technology 
+                <br> Sri Ramachandra Institute of Higher Education and Research</p>
+                <b>Email:</b><br>
+                <a href="mailto:e6122004@sret.edu.in">e6122004@sret.edu.in</a><br>
+                <a href="mailto:ksree9909@gmail.com">ksree9909@gmail.com</a>
             </div>
+        </div>
+    </div>
 
-            <!-- Second Image -->
-            <div class="col-sm-4 mb-4">
-                <div class="card card-custom">
-                    <img src="{{ url_for('static', filename='images/image3.jpeg') }}" class="card-img-top" alt="Image 2">
-                    <div class="card-body">
-                        <h5 class="card-title"><b>C. Kavya Sree</b></h5>
-                        <p>B.Sc Bioinformatics <br>Department of Bioinformatics <br>Sri Ramachandra Faculty of Engineering and Technology <br> Sri Ramachandra Institute of Higher Education and Research</p>
-                        <b>Email: </b><a href="mailto:e6122004@sret.edu.in">e6122004@sret.edu.in</a><br>
-                        <a href="mailto:ksree9909@gmail.com">ksree9909@gmail.com</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Third Image -->
-            <div class="col-sm-4 mb-4">
-                <div class="card card-custom">
-                    <img src="{{ url_for('static', filename='images/image4.jpeg') }}" class="card-img-top" alt="Image 3">
-                    <div class="card-body">
-                        <h5 class="card-title"><b>Latha</b></h5>
-                        <p>M.Sc Medical Bioinformatics <br> Department of Bioinformatics <br>Sri Ramachandra Faculty of Engineering and Technology <br> Sri Ramachandra Institute of Higher Education and Research</p>
-                        <b>Email: </b><a href="mailto:e8122003@sret.edu.in">e8122003@sret.edu.in</a><br>
-                        <a href="mailto:lathamythili2000@gmail.com">lathamythili2000@gmail.com</a>
-                    </div>
-                </div>
+    <div class="col-md-6">
+        <div class="card card-custom text-center">
+            <img src="{{ url_for('static', filename='images/image3.jpeg') }}" class="card-img-top" alt="Contact 2">
+            <div class="card-body">
+                <h5><b>Khambham Chethana</b></h5>
+                <p>B.Sc Bioinformatics <br> Department of Bioinformatics<br> Sri Ramachandra Faculty of Engineering and Technology 
+                <br> Sri Ramachandra Institute of Higher Education and Research</p>
+                <b>Email:</b><br>
+                <a href="mailto:e6122001@sret.edu.in">e6122001@sret.edu.in</a><br>
+                <a href="mailto:khambhamchethanareddy17@gmail.com">khambhamchethanareddy17@gmail.com</a>
             </div>
         </div>
     </div>
 </div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card card-custom text-center">
+            <img src="{{ url_for('static', filename='images/image4.jpeg') }}" class="card-img-top" alt="Contact 3">
+            <div class="card-body">
+                <h5><b>Latha</b></h5>
+                <p>M.Sc Medical Bioinformatics <br> Department of Bioinformatics<br> Sri Ramachandra Faculty of Engineering and Technology 
+                <br> Sri Ramachandra Institute of Higher Education and Research</p>
+                <b>Email:</b><br>
+                <a href="mailto:e8122003@sret.edu.in">e8122003@sret.edu.in</a><br>
+                <a href="mailto:lathamythili2000@gmail.com">lathamythili2000@gmail.com</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card card-custom text-center">
+            <img src="{{ url_for('static', filename='images/image5.jpeg') }}" class="card-img-top" alt="Contact 4">
+            <div class="card-body">
+                <h5><b>Harshavardhan Anandalakshmanan</b></h5>
+                <p>B.Sc (Hons) Biomedical Sciences <br> Department of Biomedical Sciences  <br> Sri Ramachandra Faculty of Biomedical Sciences and Technology
+                <br>Sri Ramachandra Institute of Higher Education and Research </p>
+                <b>Email:</b><br>
+                <a href="b0122068@sriher.edu.in">b0122068@sriher.edu.in</a><br>
+                <a href="mailto:ananh012.319@gmail.com">ananh012.319@gmail.com</a><br>
+            </div>
+        </div>
+    </div>
+
+
 
     <script>
         // JavaScript for search functionality
@@ -653,7 +715,7 @@ textarea {
             results.forEach(result => {
                 const resultDiv = document.createElement('div');
                 resultDiv.classList.add('result');
-                resultDiv.innerHTML = `<h3>${result['Sialic acid analogues']}${result['Image'] ? `<img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compund_name">` : ''}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" download>Download .mol file</a>`;
+                resultDiv.innerHTML = `<h3>${result['Sialic acid analogues']}${result['Image'] ? <img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compund_name"> : ''}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" download>Download .mol file</a>`;
                 resultsContainer.appendChild(resultDiv);
             });
         }
@@ -686,11 +748,11 @@ textarea {
                             data.results.forEach(result => {
                                 var div = document.createElement('div');
                                 div.classList.add('result');
-                                div.innerHTML = `<h3>${result['Sialic acid analogues']}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" class="download-btn">Download .mol file</a>`;
+                                div.innerHTML = <h3>${result['Sialic acid analogues']}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" class="download-btn">Download .mol file</a>;
 								resultContainer.appendChild(div);
                             });
                         } else {
-                            resultContainer.innerHTML = `<p>No results found.</p>`;
+                            resultContainer.innerHTML = <p>No results found.</p>;
                         }
                     });
             }
