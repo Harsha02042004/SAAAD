@@ -360,8 +360,52 @@ textarea {
     to {
         opacity: 1;
     }
-</style>
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px; /* space between cards */
+}
 
+.col-md-6 {
+    display: flex;
+    justify-content: center;
+}
+
+.card-custom {
+    width: 100%;
+    max-width: 350px; /* card width */
+    display: flex;
+    flex-direction: column;
+    height: 450px; /* fixed height for all cards */
+}
+
+.card-custom img {
+    height: 200px; /* fixed image height */
+    object-fit: cover;
+}
+
+.card-body {
+    flex: 1; /* fill remaining space */
+    overflow: hidden; /* hide overflow text if too long */
+}
+
+.card-body h5 {
+    font-size: 1.2rem;
+}
+
+.card-body p {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .card-custom {
+        max-width: 100%;
+        height: auto; /* allow auto height on small screens */
+    }
+}
+    </style>
 </head>
 
 <body>
@@ -558,6 +602,7 @@ textarea {
             </div>
         </div>
 
+
         
 <div class="row mb-4">
     <div class="col-md-6">
@@ -619,29 +664,27 @@ textarea {
     </div>
 
 
-
+    <!-- Scripts -->
     <script>
-        // JavaScript for search functionality
         function fetchSuggestions() {
-            var query = document.getElementById('search-query').value;
-            var suggestionsContainer = document.getElementById('suggestions');
+            const query = document.getElementById('search-query').value;
+            const suggestionsContainer = document.getElementById('suggestions');
             if (query.length > 0) {
-                fetch('/suggestions?query=' + query)
-                    .then(response => response.json())
+                fetch('/suggestions?query=' + encodeURIComponent(query))
+                    .then(res => res.json())
                     .then(data => {
                         suggestionsContainer.innerHTML = '';
-                        data.suggestions.forEach(suggestion => {
-                            var div = document.createElement('div');
-                            div.innerText = suggestion;
-                            div.onclick = () => selectSuggestion(suggestion);
+                        data.suggestions.forEach(s => {
+                            const div = document.createElement('div');
+                            div.textContent = s;
+                            div.onclick = () => selectSuggestion(s);
                             suggestionsContainer.appendChild(div);
                         });
+                        suggestionsContainer.style.display = 'block';
+                        document.querySelector('.clear-btn').style.display = 'block';
                     });
-                suggestionsContainer.style.display = 'block';
-                document.querySelector('.clear-btn').style.display = 'block';
             } else {
-                suggestionsContainer.style.display = 'none';
-                document.querySelector('.clear-btn').style.display = 'none';
+                clearSearch();
             }
         }
 
@@ -658,62 +701,35 @@ textarea {
             document.getElementById('result-container').innerHTML = '';
         }
 
-        function displayResults(results) {
-            const resultsContainer = document.getElementById('result-container');
-            resultsContainer.innerHTML = '';
-
-            if (results.length === 0) {
-                resultsContainer.innerHTML = '<p>No results found.</p>';
-                return;
-            }
-
-            results.forEach(result => {
-                const resultDiv = document.createElement('div');
-                resultDiv.classList.add('result');
-                resultDiv.innerHTML = `<h3>${result['Sialic acid analogues']}${result['Image'] ? <img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compund_name"> : ''}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" download>Download .mol file</a>`;
-                resultsContainer.appendChild(resultDiv);
-            });
-        }
-
-        function displaySuggestions(suggestions) {
-            const suggestionsContainer = document.getElementById('suggestions');
-            suggestionsContainer.innerHTML = '';
-
-            if (suggestions.length === 0) return;
-
-            const suggestionList = document.createElement('ul');
-            suggestions.forEach(suggestion => {
-                const suggestionItem = document.createElement('li');
-                suggestionItem.textContent = suggestion;
-                suggestionList.appendChild(suggestionItem);
-            });
-
-            suggestionsContainer.appendChild(suggestionList);
-        }
-
         function searchItem() {
-            var query = document.getElementById('search-query').value;
-            if (query.length > 0) {
-                fetch('/search?query=' + query)
-                    .then(response => response.json())
-                    .then(data => {
-                        var resultContainer = document.getElementById('result-container');
-                        resultContainer.innerHTML = '';
-                        if (data.results.length > 0) {
-                            data.results.forEach(result => {
-                                var div = document.createElement('div');
-                                div.classList.add('result');
-                                div.innerHTML = <h3>${result['Sialic acid analogues']}</h3><p><strong>SMILES:</strong> ${result['SMILES']}</p><p><strong>Formula:</strong> ${result['Formula']}</p><p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol']}</p><p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors']}</p><p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors']}</p><p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)']}</p><p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3']}</p><p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)']}</p><p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)']}</p><p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)']}</p><p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w']}</p><a href="/download/${result['Sialic acid analogues']}.mol" class="download-btn">Download .mol file</a>;
-								resultContainer.appendChild(div);
-                            });
-                        } else {
-                            resultContainer.innerHTML = <p>No results found.</p>;
-                        }
+            const query = document.getElementById('search-query').value;
+            if (!query) return;
+            fetch('/search?query=' + encodeURIComponent(query))
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('result-container');
+                    container.innerHTML = '';
+                    if (data.results.length === 0) {
+                        container.innerHTML = '<p>No results found.</p>';
+                        return;
+                    }
+                    data.results.forEach(r => {
+                        const div = document.createElement('div');
+                        div.classList.add('result');
+                        div.innerHTML = `
+                            <h3>${r['Sialic acid analogues']}</h3>
+                            ${r.Image ? `<img src="${r.Image}" alt="${r['Sialic acid analogues']}">` : ''}
+                            <p><strong>SMILES:</strong> ${r.SMILES || ''}</p>
+                            <p><strong>Formula:</strong> ${r.Formula || ''}</p>
+                            <p><strong>Molecular Weight:</strong> ${r['Molecular weight/g/mol'] || ''}</p>
+                            <a href="/download/${r['Sialic acid analogues']}.mol" class="download-btn">Download .mol file</a>
+                        `;
+                        container.appendChild(div);
                     });
-            }
+                });
         }
-	</script>
-    <!-- Bootstrap JS and dependencies -->
+    </script>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
