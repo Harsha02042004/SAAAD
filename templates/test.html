@@ -701,33 +701,47 @@ textarea {
             document.getElementById('result-container').innerHTML = '';
         }
 
-        function searchItem() {
-            const query = document.getElementById('search-query').value;
-            if (!query) return;
-            fetch('/search?query=' + encodeURIComponent(query))
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById('result-container');
-                    container.innerHTML = '';
-                    if (data.results.length === 0) {
-                        container.innerHTML = '<p>No results found.</p>';
-                        return;
-                    }
-                    data.results.forEach(r => {
-                        const div = document.createElement('div');
-                        div.classList.add('result');
-                        div.innerHTML = `
-                            <h3>${r['Sialic acid analogues']}</h3>
-                            ${r.Image ? `<img src="${r.Image}" alt="${r['Sialic acid analogues']}">` : ''}
-                            <p><strong>SMILES:</strong> ${r.SMILES || ''}</p>
-                            <p><strong>Formula:</strong> ${r.Formula || ''}</p>
-                            <p><strong>Molecular Weight:</strong> ${r['Molecular weight/g/mol'] || ''}</p>
-                            <a href="/download/${r['Sialic acid analogues']}.mol" class="download-btn">Download .mol file</a>
-                        `;
-                        container.appendChild(div);
-                    });
-                });
-        }
+function searchItem() {
+    const query = document.getElementById('search-query').value;
+    if (!query) return;
+
+    fetch('/search?query=' + encodeURIComponent(query))
+        .then(res => res.json())
+        .then(data => {
+            const resultsContainer = document.getElementById('result-container');
+            resultsContainer.innerHTML = '';
+
+            if (!data.results || data.results.length === 0) {
+                resultsContainer.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            data.results.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result');
+                resultDiv.innerHTML = `
+                    <h3>${result['Sialic acid analogues']}${result['Image'] ? `<img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compound-image">` : ''}</h3>
+                    <p><strong>SMILES:</strong> ${result['SMILES'] || ''}</p>
+                    <p><strong>Formula:</strong> ${result['Formula'] || ''}</p>
+                    <p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol'] || ''}</p>
+                    <p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors'] || ''}</p>
+                    <p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors'] || ''}</p>
+                    <p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)'] || ''}</p>
+                    <p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3)'] || ''}</p>
+                    <p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)'] || ''}</p>
+                    <p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)'] || ''}</p>
+                    <p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)'] || ''}</p>
+                    <p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w'] || ''}</p>
+                    <a href="/download/${result['Sialic acid analogues']}.mol" download class="download-btn">Download .mol file</a>
+                `;
+                resultsContainer.appendChild(resultDiv);
+            });
+        })
+        .catch(err => {
+            console.error('Search error:', err);
+            document.getElementById('result-container').innerHTML = '<p>Error fetching results.</p>';
+        });
+}
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
