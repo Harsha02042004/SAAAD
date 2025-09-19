@@ -13,6 +13,7 @@ DOWNLOAD_DIR = os.path.join(BASE_DIR, "sialic acid analog")  # folder in root
 # --- Load Excel dataset ---
 data_file = os.path.join(BASE_DIR, "descriptions.xlsx")  # file in root
 df = pd.read_excel(data_file)
+df["Sialic acid analogues"] = df["Sialic acid analogues"].astype(str)  # ensure string type
 
 # --- Utility: Get image path ---
 def get_image_path(compound_name):
@@ -26,26 +27,21 @@ def index():
 
 @app.route("/suggestions", methods=["GET"])
 def suggestions():
-    query = request.args.get("query")
+    query = request.args.get("query", "").strip().lower()
     if not query:
         return jsonify({"suggestions": []})
 
-    query = query.strip().lower()
-    suggestions = df[df["Sialic acid analogues"].str.contains(query, case=False, na=False, regex=False)]
-    suggestions_list = suggestions["Sialic acid analogues"].tolist()
-    return jsonify({"suggestions": suggestions_list})
+    matches = df[df["Sialic acid analogues"].str.lower().str.contains(query, na=False)]
+    return jsonify({"suggestions": matches["Sialic acid analogues"].tolist()})
 
 @app.route("/search", methods=["GET"])
 def search():
-    query = request.args.get("query")
+    query = request.args.get("query", "").strip().lower()
     if not query:
         return jsonify({"results": [], "suggestions": []})
 
-    print(f"Search Query: {query}")
-    query = query.strip().lower()
-
     try:
-        results = df[df["Sialic acid analogues"].str.contains(query, case=False, na=False, regex=False)]
+        results = df[df["Sialic acid analogues"].str.lower().str.contains(query, na=False)]
     except Exception as e:
         return jsonify({"error": f"Error processing the search: {str(e)}"})
 
@@ -62,7 +58,6 @@ def search():
 # --- Download MOL file route ---
 @app.route("/download/<filename>")
 def download_file(filename):
-    # Ensure safe path join for cloud deployment
     file_path = os.path.join(DOWNLOAD_DIR, filename)
     if not os.path.exists(file_path):
         return jsonify({"error": "File not found"}), 404
