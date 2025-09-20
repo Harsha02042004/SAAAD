@@ -485,22 +485,141 @@ textarea {
         </div>
     </div>
  </div>
-        <div class="tab-pane fade" id="Search" role="tabpanel" aria-labelledby="Search-tab">
-            <h2>
-                <br>
-                <center><b>Search the sialic acid</b></center>
-            </h2>
-            <br>
-            <div class="search-box">
-                <input type="text" id="search-query" list="searchitem" placeholder="Search for an item..."
-                    onkeyup="fetchSuggestions()">
-                <span class="clear-btn" onclick="clearSearch()">&#10006;</span>
-                <button class="search-btn" onclick="searchItem()">Search</button>
-            </div>
-            <div id="suggestions" class="suggestions"></div>
-            <br>
-            <div id="result-container" class="result-container"></div>
-        </div>
+<div class="tab-pane fade" id="Search" role="tabpanel" aria-labelledby="Search-tab">
+    <h2><center><b>Search the sialic acid</b></center></h2>
+    <br>
+
+    <!-- Search Box -->
+    <div class="search-box">
+        <input type="text" id="search-query" placeholder="Search for an item..." onkeyup="fetchSuggestions()">
+        <span class="clear-btn" onclick="clearSearch()">&#10006;</span>
+        <button class="search-btn" onclick="searchItem()">Search</button>
+    </div>
+    <div id="suggestions" class="suggestions"></div>
+    <br>
+
+    <!-- All Records -->
+    <h3><center>All Records</center></h3>
+    <div id="all-records-container" class="links-list"></div>
+    <br>
+
+    <!-- Result Container -->
+    <div id="result-container" class="result-container"></div>
+
+    <script>
+        // Fetch search suggestions
+        function fetchSuggestions() {
+            const query = document.getElementById('search-query').value;
+            const suggestionsContainer = document.getElementById('suggestions');
+            if (query.length > 0) {
+                fetch('/suggestions?query=' + encodeURIComponent(query))
+                    .then(res => res.json())
+                    .then(data => {
+                        suggestionsContainer.innerHTML = '';
+                        data.suggestions.forEach(s => {
+                            const div = document.createElement('div');
+                            div.textContent = s;
+                            div.onclick = () => selectSuggestion(s);
+                            suggestionsContainer.appendChild(div);
+                        });
+                        suggestionsContainer.style.display = 'block';
+                        document.querySelector('.clear-btn').style.display = 'block';
+                    });
+            } else {
+                clearSearch();
+            }
+        }
+
+        function selectSuggestion(suggestion) {
+            document.getElementById('search-query').value = suggestion;
+            document.getElementById('suggestions').style.display = 'none';
+            document.querySelector('.clear-btn').style.display = 'block';
+        }
+
+        function clearSearch() {
+            document.getElementById('search-query').value = '';
+            document.getElementById('suggestions').style.display = 'none';
+            document.querySelector('.clear-btn').style.display = 'none';
+            document.getElementById('result-container').innerHTML = '';
+        }
+
+        // Search item by query
+        function searchItem() {
+            const query = document.getElementById('search-query').value;
+            if (!query) return;
+            fetch('/search?query=' + encodeURIComponent(query))
+                .then(res => res.json())
+                .then(data => displayResults(data))
+                .catch(err => {
+                    console.error('Search error:', err);
+                    document.getElementById('result-container').innerHTML = '<p>Error fetching results.</p>';
+                });
+        }
+
+        // Display results in #result-container
+        function displayResults(data) {
+            const resultsContainer = document.getElementById('result-container');
+            resultsContainer.innerHTML = '';
+
+            if (!data.results || data.results.length === 0) {
+                resultsContainer.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            data.results.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result');
+                resultDiv.innerHTML = `
+                    <h3>${result['Sialic acid analogues'] || ''} 
+                        ${result['Image'] ? `<img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compound-image">` : ''}
+                    </h3>
+                    <p><strong>SMILES:</strong> ${result['SMILES'] || ''}</p>
+                    <p><strong>Formula:</strong> ${result['Formula'] || ''}</p>
+                    <p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol'] || ''}</p>
+                    <p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors'] || ''}</p>
+                    <p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors'] || ''}</p>
+                    <p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)'] || ''}</p>
+                    <p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3)'] || ''}</p>
+                    <p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)'] || ''}</p>
+                    <p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)'] || ''}</p>
+                    <p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)'] || ''}</p>
+                    <p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w'] || ''}</p>
+                    <a href="/download/${result['Sialic acid analogues']}.mol" download class="download-btn">Download .mol file</a>
+                `;
+                resultsContainer.appendChild(resultDiv);
+            });
+        }
+
+        // Load all records on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/all_records')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('all-records-container');
+                    container.innerHTML = '';
+                    data.compounds.forEach(name => {
+                        const div = document.createElement('div');
+                        div.textContent = name;
+                        div.classList.add('link-item');
+                        div.style.cursor = 'pointer';
+                        div.onclick = () => loadCompound(name);
+                        container.appendChild(div);
+                    });
+                });
+        });
+
+        // Load a single compound's details
+        function loadCompound(name) {
+            fetch('/search?query=' + encodeURIComponent(name))
+                .then(res => res.json())
+                .then(data => displayResults(data))
+                .catch(err => {
+                    console.error('Error loading compound:', err);
+                });
+        }
+    </script>
+</div>
+
 		
         <div class="tab-pane fade" id="Tutorial" role="tabpanel" aria-labelledby="Tutorial-tab">
              <br><h4><b>TUTORIAL</b> </h4>
