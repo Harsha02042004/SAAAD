@@ -68,22 +68,6 @@ def download_file(filename):
         return jsonify({"error": "File not found"}), 404
     return send_file(file_path, as_attachment=True)
 
-@app.route("/all")
-def all_records():
-    compounds = df["Sialic acid analogues"].dropna().tolist()
-    return render_template("all_records.html", compounds=compounds)
-
-@app.route("/compound/<name>")
-def compound(name):
-    results = df[df["Sialic acid analogues"].str.lower() == name.lower()]
-    if results.empty:
-        return jsonify({"error": "Compound not found"}), 404
-    results_dict = results.to_dict(orient="records")
-    for result in results_dict:
-        result["Image"] = get_image_path(result["Sialic acid analogues"])
-    return render_template("compound.html", results=results_dict)
-
-
 # --- Email Config (from environment variables) ---
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
