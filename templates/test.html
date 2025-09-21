@@ -180,6 +180,95 @@
             text-decoration: none;
             border-radius: 5px;
         }
+
+        .browse-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .record-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .record-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .record-card h5 {
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .record-card .formula {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .record-card .molecular-weight {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .record-detail {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .record-detail img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .record-detail h3 {
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .record-detail p {
+            margin: 8px 0;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .back-btn {
+            background-color: #6c757d;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .back-btn:hover {
+            background-color: #5a6268;
+            text-decoration: none;
+            color: #fff;
+        }
 .links-list {
         background-color: #f9f9f9;
         padding: 20px;
@@ -424,6 +513,10 @@ textarea {
                         aria-controls="Search" aria-selected="false">Search</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" id="Browse-tab" data-toggle="tab" href="#Browse" role="tab"
+                        aria-controls="Browse" aria-selected="false">Browse All</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" id="Tutorial-tab" data-toggle="tab" href="#Tutorial" role="tab"
                         aria-controls="Tutorial" aria-selected="false">Tutorial</a>
                 </li>
@@ -500,6 +593,18 @@ textarea {
             <div id="suggestions" class="suggestions"></div>
             <br>
             <div id="result-container" class="result-container"></div>
+        </div>
+		
+        <div class="tab-pane fade" id="Browse" role="tabpanel" aria-labelledby="Browse-tab">
+            <h2>
+                <br>
+                <center><b>Browse All Sialic Acid Analogues</b></center>
+            </h2>
+            <br>
+            <div id="loading-message" style="text-align: center; display: none;">
+                <p>Loading records...</p>
+            </div>
+            <div id="browse-container" class="browse-container"></div>
         </div>
 		
         <div class="tab-pane fade" id="Tutorial" role="tabpanel" aria-labelledby="Tutorial-tab">
@@ -743,6 +848,75 @@ function searchItem() {
         });
 }
     </script>
+        // Browse All functionality
+        function loadAllRecords() {
+            const loadingMessage = document.getElementById('loading-message');
+            const browseContainer = document.getElementById('browse-container');
+            
+            loadingMessage.style.display = 'block';
+            browseContainer.innerHTML = '';
+
+            fetch('/browse_all')
+                .then(res => res.json())
+                .then(data => {
+                    loadingMessage.style.display = 'none';
+                    
+                    if (!data.records || data.records.length === 0) {
+                        browseContainer.innerHTML = '<p>No records found.</p>';
+                        return;
+                    }
+
+                    data.records.forEach(record => {
+                        const recordCard = document.createElement('div');
+                        recordCard.classList.add('record-card');
+                        recordCard.innerHTML = `
+                            <h5>${record['Sialic acid analogues']}</h5>
+                            <div class="formula">Formula: ${record['Formula'] || 'N/A'}</div>
+                            <div class="molecular-weight">MW: ${record['Molecular weight/g/mol'] || 'N/A'} g/mol</div>
+                        `;
+                        recordCard.onclick = () => showRecordDetail(record);
+                        browseContainer.appendChild(recordCard);
+                    });
+                })
+                .catch(err => {
+                    console.error('Browse error:', err);
+                    loadingMessage.style.display = 'none';
+                    browseContainer.innerHTML = '<p>Error loading records.</p>';
+                });
+        }
+
+        function showRecordDetail(record) {
+            const browseContainer = document.getElementById('browse-container');
+            browseContainer.innerHTML = `
+                <div class="record-detail">
+                    <button class="back-btn" onclick="loadAllRecords()">← Back to Browse</button>
+                    <h3>${record['Sialic acid analogues']}</h3>
+                    ${record['Image'] ? `<img src="${record['Image']}" alt="${record['Sialic acid analogues']} image" class="compound-image">` : ''}
+                    <p><strong>SMILES:</strong> ${record['SMILES'] || 'N/A'}</p>
+                    <p><strong>Formula:</strong> ${record['Formula'] || 'N/A'}</p>
+                    <p><strong>Molecular Weight:</strong> ${record['Molecular weight/g/mol'] || 'N/A'} g/mol</p>
+                    <p><strong>Num. H-bond Acceptors:</strong> ${record['Num. H-bond acceptors'] || 'N/A'}</p>
+                    <p><strong>Num. H-bond Donors:</strong> ${record['Num. H-bond donors'] || 'N/A'}</p>
+                    <p><strong>Log Po/w (iLOGP):</strong> ${record['Log Po/w (iLOGP)'] || 'N/A'}</p>
+                    <p><strong>Log Po/w (XLOGP3):</strong> ${record['Log Po/w (XLOGP3'] || 'N/A'}</p>
+                    <p><strong>Log Po/w (WLOGP):</strong> ${record['Log Po/w (WLOGP)'] || 'N/A'}</p>
+                    <p><strong>Log Po/w (MLOGP):</strong> ${record['Log Po/w (MLOGP)'] || 'N/A'}</p>
+                    <p><strong>Log Po/w (SILICOS-IT):</strong> ${record['Log Po/w (SILICOS-IT)'] || 'N/A'}</p>
+                    <p><strong>Consensus Log Po/w:</strong> ${record['Consensus Log Po/w'] || 'N/A'}</p>
+                    <a href="/download/${record['Sialic acid analogues']}.mol" download class="download-btn">Download .mol file</a>
+                </div>
+            `;
+        }
+
+        // Load records when Browse tab is clicked
+        document.getElementById('Browse-tab').addEventListener('click', function() {
+            setTimeout(() => {
+                if (document.getElementById('browse-container').innerHTML === '') {
+                    loadAllRecords();
+                }
+            }, 100);
+        });
+
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
