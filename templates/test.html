@@ -916,6 +916,43 @@ function searchItem() {
             }
         }, 100);
     });
+
+		<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Trigger loadAllRecords when Browse tab is opened
+    document.getElementById('Browse-tab').addEventListener('shown.bs.tab', function () {
+        loadAllRecords();
+    });
+});
+</script>
+<script>
+function loadAllRecords() {
+    document.getElementById('loading-message').style.display = "block";
+    fetch('/browse')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loading-message').style.display = "none";
+            const container = document.getElementById('browse-container');
+            container.innerHTML = '';
+
+            data.forEach(record => {
+                const card = document.createElement('div');
+                card.classList.add('record-card');
+                card.innerHTML = `
+                    <h5>${record.IUPAC_NAME}</h5>
+                    <p class="formula">Formula: ${record.FORMULA}</p>
+                    <p class="molecular-weight">MW: ${record.MOLECULAR_WEIGHT}</p>
+                `;
+                container.appendChild(card);
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('loading-message').style.display = "none";
+        });
+}
+</script>
+
 </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
