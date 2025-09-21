@@ -849,8 +849,11 @@ function searchItem() {
 }
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+console.log("Script loaded");
+
 // Browse All functionality
 function loadAllRecords() {
+  console.log("loadAllRecords() called ");
   const loadingMessage = document.getElementById('loading-message');
   const browseContainer = document.getElementById('browse-container');
 
@@ -858,8 +861,12 @@ function loadAllRecords() {
   browseContainer.innerHTML = '';
 
   fetch('/browse_all')
-    .then(res => res.json())
+    .then(res => {
+      console.log("Fetch response status:", res.status);
+      return res.json();
+    })
     .then(data => {
+      console.log("Data received:", data);
       loadingMessage.style.display = 'none';
 
       if (!data.records || data.records.length === 0) {
@@ -887,6 +894,7 @@ function loadAllRecords() {
 }
 
 function showRecordDetail(record) {
+  console.log("Showing details for:", record);
   const browseContainer = document.getElementById('browse-container');
   browseContainer.innerHTML = `
     <div class="record-detail">
@@ -894,28 +902,23 @@ function showRecordDetail(record) {
       <h3>${record['Sialic acid analogues']}</h3>
       ${record['Image'] ? `<img src="${record['Image']}" alt="${record['Sialic acid analogues']} image" class="compound-image">` : ''}
       <p><strong>SMILES:</strong> ${record['SMILES'] || 'N/A'}</p>
-      <p><strong>Formula:</strong> ${record['Formula'] || 'N/A'}</p>
-      <p><strong>Molecular Weight:</strong> ${record['Molecular weight/g/mol'] || 'N/A'} g/mol</p>
-      <p><strong>Num. H-bond Acceptors:</strong> ${record['Num. H-bond acceptors'] || 'N/A'}</p>
-      <p><strong>Num. H-bond Donors:</strong> ${record['Num. H-bond donors'] || 'N/A'}</p>
-      <p><strong>Log Po/w (iLOGP):</strong> ${record['Log Po/w (iLOGP)'] || 'N/A'}</p>
-      <p><strong>Log Po/w (XLOGP3):</strong> ${record['Log Po/w (XLOGP3)'] || 'N/A'}</p>
-      <p><strong>Log Po/w (WLOGP):</strong> ${record['Log Po/w (WLOGP)'] || 'N/A'}</p>
-      <p><strong>Log Po/w (MLOGP):</strong> ${record['Log Po/w (MLOGP)'] || 'N/A'}</p>
-      <p><strong>Log Po/w (SILICOS-IT):</strong> ${record['Log Po/w (SILICOS-IT)'] || 'N/A'}</p>
-      <p><strong>Consensus Log Po/w:</strong> ${record['Consensus Log Po/w'] || 'N/A'}</p>
-      <a href="/download/${record['Sialic acid analogues']}.mol" download class="btn btn-primary">Download .mol file</a>
     </div>
   `;
 }
 
 // Bind Browse tab event
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById('Browse-tab').addEventListener('shown.bs.tab', function () {
+  console.log("DOM fully loaded");
+  const browseTab = document.getElementById('Browse-tab');
+  console.log("Browse tab element:", browseTab);
+
+  browseTab.addEventListener('shown.bs.tab', function () {
+    console.log("Browse tab clicked 🖱️");
     loadAllRecords();
   });
 });
 </script>
+
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
