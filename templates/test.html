@@ -847,112 +847,74 @@ function searchItem() {
             document.getElementById('result-container').innerHTML = '<p>Error fetching results.</p>';
         });
 }
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Browse All functionality
-    function loadAllRecords() {
-        const loadingMessage = document.getElementById('loading-message');
-        const browseContainer = document.getElementById('browse-container');
-        
-        loadingMessage.style.display = 'block';
-        browseContainer.innerHTML = '';
-
-        fetch('/browse_all')
-            .then(res => res.json())
-            .then(data => {
-                loadingMessage.style.display = 'none';
-                
-                if (!data.records || data.records.length === 0) {
-                    browseContainer.innerHTML = '<p>No records found.</p>';
-                    return;
-                }
-
-                data.records.forEach(record => {
-                    const recordCard = document.createElement('div');
-                    recordCard.classList.add('record-card');
-                    recordCard.innerHTML = `
-                        <h5>${record['Sialic acid analogues']}</h5>
-                        <div class="formula">Formula: ${record['Formula'] || 'N/A'}</div>
-                        <div class="molecular-weight">MW: ${record['Molecular weight/g/mol'] || 'N/A'} g/mol</div>
-                    `;
-                    recordCard.onclick = () => showRecordDetail(record);
-                    browseContainer.appendChild(recordCard);
-                });
-            })
-            .catch(err => {
-                console.error('Browse error:', err);
-                loadingMessage.style.display = 'none';
-                browseContainer.innerHTML = '<p>Error loading records.</p>';
-            });
-    }
-
-    function showRecordDetail(record) {
-        const browseContainer = document.getElementById('browse-container');
-        browseContainer.innerHTML = `
-            <div class="record-detail">
-                <button class="back-btn" onclick="loadAllRecords()">← Back to Browse</button>
-                <h3>${record['Sialic acid analogues']}</h3>
-                ${record['Image'] ? `<img src="${record['Image']}" alt="${record['Sialic acid analogues']} image" class="compound-image">` : ''}
-                <p><strong>SMILES:</strong> ${record['SMILES'] || 'N/A'}</p>
-                <p><strong>Formula:</strong> ${record['Formula'] || 'N/A'}</p>
-                <p><strong>Molecular Weight:</strong> ${record['Molecular weight/g/mol'] || 'N/A'} g/mol</p>
-                <p><strong>Num. H-bond Acceptors:</strong> ${record['Num. H-bond acceptors'] || 'N/A'}</p>
-                <p><strong>Num. H-bond Donors:</strong> ${record['Num. H-bond donors'] || 'N/A'}</p>
-                <p><strong>Log Po/w (iLOGP):</strong> ${record['Log Po/w (iLOGP)'] || 'N/A'}</p>
-                <p><strong>Log Po/w (XLOGP3):</strong> ${record['Log Po/w (XLOGP3)'] || 'N/A'}</p>
-                <p><strong>Log Po/w (WLOGP):</strong> ${record['Log Po/w (WLOGP)'] || 'N/A'}</p>
-                <p><strong>Log Po/w (MLOGP):</strong> ${record['Log Po/w (MLOGP)'] || 'N/A'}</p>
-                <p><strong>Log Po/w (SILICOS-IT):</strong> ${record['Log Po/w (SILICOS-IT)'] || 'N/A'}</p>
-                <p><strong>Consensus Log Po/w:</strong> ${record['Consensus Log Po/w'] || 'N/A'}</p>
-                <a href="/download/${encodeURIComponent(record['Sialic acid analogues'])}.mol" download class="download-btn">Download .mol file</a>
-            </div>
-        `;
-    }
-
-    // Load records when Browse tab is clicked
-    document.getElementById('Browse-tab').addEventListener('click', function() {
-        setTimeout(() => {
-            if (document.getElementById('browse-container').innerHTML === '') {
-                loadAllRecords();
-            }
-        }, 100);
-    });
-
-		<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Trigger loadAllRecords when Browse tab is opened
-    document.getElementById('Browse-tab').addEventListener('shown.bs.tab', function () {
-        loadAllRecords();
-    });
-});
-</script>
-<script>
+// Browse All functionality
 function loadAllRecords() {
-    document.getElementById('loading-message').style.display = "block";
-    fetch('/browse')
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('loading-message').style.display = "none";
-            const container = document.getElementById('browse-container');
-            container.innerHTML = '';
+  const loadingMessage = document.getElementById('loading-message');
+  const browseContainer = document.getElementById('browse-container');
 
-            data.forEach(record => {
-                const card = document.createElement('div');
-                card.classList.add('record-card');
-                card.innerHTML = `
-                    <h5>${record.IUPAC_NAME}</h5>
-                    <p class="formula">Formula: ${record.FORMULA}</p>
-                    <p class="molecular-weight">MW: ${record.MOLECULAR_WEIGHT}</p>
-                `;
-                container.appendChild(card);
-            });
-        })
-        .catch(err => {
-            console.error(err);
-            document.getElementById('loading-message').style.display = "none";
-        });
+  loadingMessage.style.display = 'block';
+  browseContainer.innerHTML = '';
+
+  fetch('/browse_all')
+    .then(res => res.json())
+    .then(data => {
+      loadingMessage.style.display = 'none';
+
+      if (!data.records || data.records.length === 0) {
+        browseContainer.innerHTML = '<p>No records found.</p>';
+        return;
+      }
+
+      data.records.forEach(record => {
+        const recordCard = document.createElement('div');
+        recordCard.classList.add('record-card');
+        recordCard.innerHTML = `
+          <h5>${record['Sialic acid analogues']}</h5>
+          <div class="formula">Formula: ${record['Formula'] || 'N/A'}</div>
+          <div class="molecular-weight">MW: ${record['Molecular weight/g/mol'] || 'N/A'} g/mol</div>
+        `;
+        recordCard.onclick = () => showRecordDetail(record);
+        browseContainer.appendChild(recordCard);
+      });
+    })
+    .catch(err => {
+      console.error('Browse error:', err);
+      loadingMessage.style.display = 'none';
+      browseContainer.innerHTML = '<p>Error loading records.</p>';
+    });
 }
-</script>
 
+function showRecordDetail(record) {
+  const browseContainer = document.getElementById('browse-container');
+  browseContainer.innerHTML = `
+    <div class="record-detail">
+      <button class="btn btn-secondary back-btn" onclick="loadAllRecords()">← Back to Browse</button>
+      <h3>${record['Sialic acid analogues']}</h3>
+      ${record['Image'] ? `<img src="${record['Image']}" alt="${record['Sialic acid analogues']} image" class="compound-image">` : ''}
+      <p><strong>SMILES:</strong> ${record['SMILES'] || 'N/A'}</p>
+      <p><strong>Formula:</strong> ${record['Formula'] || 'N/A'}</p>
+      <p><strong>Molecular Weight:</strong> ${record['Molecular weight/g/mol'] || 'N/A'} g/mol</p>
+      <p><strong>Num. H-bond Acceptors:</strong> ${record['Num. H-bond acceptors'] || 'N/A'}</p>
+      <p><strong>Num. H-bond Donors:</strong> ${record['Num. H-bond donors'] || 'N/A'}</p>
+      <p><strong>Log Po/w (iLOGP):</strong> ${record['Log Po/w (iLOGP)'] || 'N/A'}</p>
+      <p><strong>Log Po/w (XLOGP3):</strong> ${record['Log Po/w (XLOGP3)'] || 'N/A'}</p>
+      <p><strong>Log Po/w (WLOGP):</strong> ${record['Log Po/w (WLOGP)'] || 'N/A'}</p>
+      <p><strong>Log Po/w (MLOGP):</strong> ${record['Log Po/w (MLOGP)'] || 'N/A'}</p>
+      <p><strong>Log Po/w (SILICOS-IT):</strong> ${record['Log Po/w (SILICOS-IT)'] || 'N/A'}</p>
+      <p><strong>Consensus Log Po/w:</strong> ${record['Consensus Log Po/w'] || 'N/A'}</p>
+      <a href="/download/${record['Sialic acid analogues']}.mol" download class="btn btn-primary">Download .mol file</a>
+    </div>
+  `;
+}
+
+// Bind Browse tab event
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById('Browse-tab').addEventListener('shown.bs.tab', function () {
+    loadAllRecords();
+  });
+});
 </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
