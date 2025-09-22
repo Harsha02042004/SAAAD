@@ -772,6 +772,10 @@ textarea {
         </div>
     </div>
 
+   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="your_custom.js"></script>
 
     <!-- Scripts -->
     <script>
@@ -935,22 +939,13 @@ function searchItem() {
             `;
         }
 
-        // Event listener for Browse tab
-        document.addEventListener("DOMContentLoaded", function () {
-            console.log("DOM fully loaded");
-            
-            // Use jQuery tab events since Bootstrap 4 is being used
-            $('#Browse-tab').on('shown.bs.tab', function (e) {
-                console.log("Browse tab activated");
-                loadAllRecords();
-            });
-        });
-
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+$(function() {
+    $('#Browse-tab').on('shown.bs.tab', function (e) {
+        console.log("Browse tab activated");
+        loadAllRecords();
+    });
+});
+ 
 </body>
 
 </html>
