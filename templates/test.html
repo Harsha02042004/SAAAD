@@ -7,6 +7,7 @@
     <title>SAACD - Sialic Acid Analogues</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             background-color: white;
@@ -449,6 +450,9 @@ textarea {
     to {
         opacity: 1;
     }
+}
+
+/* Row styling */
 .row {
     display: flex;
     flex-wrap: wrap;
@@ -498,47 +502,46 @@ textarea {
 </head>
 
 <body>
-    <div class="navbar">
-        <div class="icon">
-            <h2 class="logo"><b>SAAAD</b></h2>
-        </div>
-        <div class="container">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab"
-                        aria-controls="home" aria-selected="true">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="Search-tab" data-toggle="tab" href="#Search" role="tab"
-                        aria-controls="Search" aria-selected="false">Search</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="Browse-tab" data-toggle="tab" href="#Browse" role="tab"
-                        aria-controls="Browse" aria-selected="false">Browse All</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="Tutorial-tab" data-toggle="tab" href="#Tutorial" role="tab"
-                        aria-controls="Tutorial" aria-selected="false">Tutorial</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="Statistics-tab" data-toggle="tab" href="#Statistics" role="tab"
-                        aria-controls="Statistics" aria-selected="false">Statistics</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="FAQ-tab" data-toggle="tab" href="#FAQ" role="tab"
-                        aria-controls="FAQ" aria-selected="false">FAQ's</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="Links-tab" data-toggle="tab" href="#Links" role="tab"
-                        aria-controls="Links" aria-selected="false">Links & Citation</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="Contact-tab" data-toggle="tab" href="#Contact" role="tab"
-                        aria-controls="Contact" aria-selected="false">Contact Us</a>
-                </li>
-            </ul>
-        </div>
+   <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <h2 class="logo mb-0"><b>SAAAD</b></h2>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="Search-tab" data-toggle="tab" href="#Search">Search</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="Browse-tab" data-toggle="tab" href="#Browse">Browse All</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="Tutorial-tab" data-toggle="tab" href="#Tutorial">Tutorial</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="Statistics-tab" data-toggle="tab" href="#Statistics">Statistics</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="FAQ-tab" data-toggle="tab" href="#FAQ">FAQ's</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="Links-tab" data-toggle="tab" href="#Links">Links & Citation</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="Contact-tab" data-toggle="tab" href="#Contact">Contact Us</a>
+        </li>
+      </ul>
     </div>
+  </div>
+</nav>
 
     <div class="text-box">
         <h2><b>Sialic Acid Analogues</b></h2>
@@ -772,40 +775,50 @@ textarea {
 
     <!-- Scripts -->
     <script>
-        function fetchSuggestions() {
-            const query = document.getElementById('search-query').value;
-            const suggestionsContainer = document.getElementById('suggestions');
-            if (query.length > 0) {
-                fetch('/suggestions?query=' + encodeURIComponent(query))
-                    .then(res => res.json())
-                    .then(data => {
-                        suggestionsContainer.innerHTML = '';
-                        data.suggestions.forEach(s => {
-                            const div = document.createElement('div');
-                            div.textContent = s;
-                            div.onclick = () => selectSuggestion(s);
-                            suggestionsContainer.appendChild(div);
-                        });
-                        suggestionsContainer.style.display = 'block';
-                        document.querySelector('.clear-btn').style.display = 'block';
+<script>
+function fetchSuggestions() {
+    const query = document.getElementById('search-query').value;
+    const suggestionsContainer = document.getElementById('suggestions');
+
+    if (query.length > 0) {
+        fetch('/suggestions?query=' + encodeURIComponent(query))
+            .then(res => res.json())
+            .then(data => {
+                suggestionsContainer.innerHTML = '';
+                if (data.suggestions && data.suggestions.length > 0) {
+                    data.suggestions.forEach(s => {
+                        const div = document.createElement('div');
+                        div.textContent = s;
+                        div.onclick = () => selectSuggestion(s);
+                        suggestionsContainer.appendChild(div);
                     });
-            } else {
-                clearSearch();
-            }
-        }
+                    suggestionsContainer.style.display = 'block';
+                    document.querySelector('.clear-btn').style.display = 'block';
+                } else {
+                    suggestionsContainer.style.display = 'none';
+                }
+            })
+            .catch(err => {
+                console.error('Error fetching suggestions:', err);
+                suggestionsContainer.style.display = 'none';
+            });
+    } else {
+        clearSearch();
+    }
+}
 
-        function selectSuggestion(suggestion) {
-            document.getElementById('search-query').value = suggestion;
-            document.getElementById('suggestions').style.display = 'none';
-            document.querySelector('.clear-btn').style.display = 'block';
-        }
+function selectSuggestion(suggestion) {
+    document.getElementById('search-query').value = suggestion;
+    document.getElementById('suggestions').style.display = 'none';
+    document.querySelector('.clear-btn').style.display = 'block';
+}
 
-        function clearSearch() {
-            document.getElementById('search-query').value = '';
-            document.getElementById('suggestions').style.display = 'none';
-            document.querySelector('.clear-btn').style.display = 'none';
-            document.getElementById('result-container').innerHTML = '';
-        }
+function clearSearch() {
+    document.getElementById('search-query').value = '';
+    document.getElementById('suggestions').style.display = 'none';
+    document.querySelector('.clear-btn').style.display = 'none';
+    document.getElementById('result-container').innerHTML = '';
+}
 
 function searchItem() {
     const query = document.getElementById('search-query').value;
