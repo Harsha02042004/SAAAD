@@ -97,20 +97,5 @@ def send_email(question):
         server.login(SMTP_USERNAME, SMTP_PASSWORD)
         server.sendmail(from_email, to_email, email_message)
 
-# --- Browse All Records route ---
-@app.route("/browse_all", methods=["GET"])
-def browse_all():
-    try:
-        # Get all records from the dataframe
-        all_records = df.to_dict(orient="records")
-        
-        # Add image paths for each record
-        for record in all_records:
-            record["Image"] = get_image_path(record["Sialic acid analogues"])
-        
-        return jsonify({"records": all_records})
-    except Exception as e:
-        return jsonify({"error": f"Error fetching records: {str(e)}"})
-
 if __name__ == "__main__":
     app.run(debug=True)
