@@ -68,6 +68,21 @@ def download_file(filename):
         return jsonify({"error": "File not found"}), 404
     return send_file(file_path, as_attachment=True)
 
+# --- Browse All route ---
+@app.route("/browse_all", methods=["GET"])
+def browse_all():
+    try:
+        # Get all records from the dataframe
+        all_records = df.to_dict(orient="records")
+        
+        # Add image paths to each record
+        for record in all_records:
+            record["Image"] = get_image_path(record["Sialic acid analogues"])
+        
+        return jsonify({"records": all_records})
+    except Exception as e:
+        return jsonify({"error": f"Error fetching records: {str(e)}"})
+
 # --- Email Config (from environment variables) ---
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587

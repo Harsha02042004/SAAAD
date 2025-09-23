@@ -405,6 +405,61 @@ textarea {
         height: auto; /* allow auto height on small screens */
     }
 }
+
+    /* Browse All Styles */
+    .browse-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .browse-card {
+        background: #fff;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .browse-card:hover {
+        border-color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .browse-card h5 {
+        color: #333;
+        font-size: 1rem;
+        margin: 0;
+        word-wrap: break-word;
+        line-height: 1.3;
+    }
+
+    .browse-card:hover h5 {
+        color: #007bff;
+    }
+
+    @media (max-width: 768px) {
+        .browse-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 15px;
+        }
+        
+        .browse-card {
+            padding: 15px;
+        }
+        
+        .browse-card h5 {
+            font-size: 0.9rem;
+        }
+    }
     </style>
 </head>
 
@@ -422,6 +477,10 @@ textarea {
                 <li class="nav-item">
                     <a class="nav-link" id="Search-tab" data-toggle="tab" href="#Search" role="tab"
                         aria-controls="Search" aria-selected="false">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="BrowseAll-tab" data-toggle="tab" href="#BrowseAll" role="tab"
+                        aria-controls="BrowseAll" aria-selected="false">Browse All</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="Tutorial-tab" data-toggle="tab" href="#Tutorial" role="tab"
@@ -502,6 +561,22 @@ textarea {
             <div id="result-container" class="result-container"></div>
         </div>
 		
+        <div class="tab-pane fade" id="BrowseAll" role="tabpanel" aria-labelledby="BrowseAll-tab">
+            <br>
+            <h2><center><b>Browse All Sialic Acid Analogues</b></center></h2>
+            <br>
+            <div id="browse-loading" style="text-align: center; display: none;">
+                <p>Loading records...</p>
+            </div>
+            <div id="browse-grid-container">
+                <div id="browse-grid" class="browse-grid"></div>
+            </div>
+            <div id="browse-detail-container" style="display: none;">
+                <button class="btn btn-secondary mb-3" onclick="showBrowseGrid()">← Back to Browse</button>
+                <div id="browse-detail-content"></div>
+            </div>
+        </div>
+
         <div class="tab-pane fade" id="Tutorial" role="tabpanel" aria-labelledby="Tutorial-tab">
              <br><h4><b>TUTORIAL</b> </h4>
 			 <P> The SEARCH can be used to search for entries of your interest. It can be done in <b><i style="color:green">SIMPLE SEARCH</i></B></P>
@@ -742,6 +817,94 @@ function searchItem() {
             document.getElementById('result-container').innerHTML = '<p>Error fetching results.</p>';
         });
 }
+
+    // Browse All functionality
+    let allRecords = [];
+    let browseAllLoaded = false;
+
+    // Load all records when Browse All tab is clicked
+    $(document).ready(function() {
+        $('#BrowseAll-tab').on('shown.bs.tab', function() {
+            if (!browseAllLoaded) {
+                loadAllRecords();
+            }
+        });
+    });
+
+    function loadAllRecords() {
+        document.getElementById('browse-loading').style.display = 'block';
+        document.getElementById('browse-grid').innerHTML = '';
+        
+        fetch('/browse_all')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('browse-loading').style.display = 'none';
+                
+                if (data.error) {
+                    document.getElementById('browse-grid').innerHTML = '<p>Error loading records: ' + data.error + '</p>';
+                    return;
+                }
+                
+                allRecords = data.records;
+                displayBrowseGrid();
+                browseAllLoaded = true;
+            })
+            .catch(error => {
+                document.getElementById('browse-loading').style.display = 'none';
+                document.getElementById('browse-grid').innerHTML = '<p>Error loading records.</p>';
+                console.error('Error:', error);
+            });
+    }
+
+    function displayBrowseGrid() {
+        const gridContainer = document.getElementById('browse-grid');
+        gridContainer.innerHTML = '';
+        
+        allRecords.forEach((record, index) => {
+            const card = document.createElement('div');
+            card.className = 'browse-card';
+            card.onclick = () => showRecordDetail(record);
+            
+            card.innerHTML = `
+                <h5>${record['Sialic acid analogues']}</h5>
+            `;
+            
+            gridContainer.appendChild(card);
+        });
+    }
+
+    function showRecordDetail(record) {
+        const detailContent = document.getElementById('browse-detail-content');
+        
+        // Create the same format as search results
+        detailContent.innerHTML = `
+            <div class="result">
+                <h3>${record['Sialic acid analogues']}${record['Image'] ? `<img src="${record['Image']}" alt="${record['Sialic acid analogues']} image" class="compound-image">` : ''}</h3>
+                <p><strong>SMILES:</strong> ${record['SMILES'] || ''}</p>
+                <p><strong>Formula:</strong> ${record['Formula'] || ''}</p>
+                <p><strong>Molecular Weight:</strong> ${record['Molecular weight/g/mol'] || ''}</p>
+                <p><strong>Num. H-bond Acceptors:</strong> ${record['Num. H-bond acceptors'] || ''}</p>
+                <p><strong>Num. H-bond Donors:</strong> ${record['Num. H-bond donors'] || ''}</p>
+                <p><strong>Log Po/w (iLOGP):</strong> ${record['Log Po/w (iLOGP)'] || ''}</p>
+                <p><strong>Log Po/w (XLOGP3):</strong> ${record['Log Po/w (XLOGP3'] || ''}</p>
+                <p><strong>Log Po/w (WLOGP):</strong> ${record['Log Po/w (WLOGP)'] || ''}</p>
+                <p><strong>Log Po/w (MLOGP):</strong> ${record['Log Po/w (MLOGP)'] || ''}</p>
+                <p><strong>Log Po/w (SILICOS-IT):</strong> ${record['Log Po/w (SILICOS-IT)'] || ''}</p>
+                <p><strong>Consensus Log Po/w:</strong> ${record['Consensus Log Po/w'] || ''}</p>
+                <a href="/download/${record['Sialic acid analogues']}.mol" download class="download-btn">Download .mol file</a>
+            </div>
+        `;
+        
+        // Hide grid and show detail
+        document.getElementById('browse-grid-container').style.display = 'none';
+        document.getElementById('browse-detail-container').style.display = 'block';
+    }
+
+    function showBrowseGrid() {
+        // Hide detail and show grid
+        document.getElementById('browse-detail-container').style.display = 'none';
+        document.getElementById('browse-grid-container').style.display = 'block';
+    }
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
