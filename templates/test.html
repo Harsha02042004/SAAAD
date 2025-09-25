@@ -822,22 +822,27 @@ function searchItem() {
     let allRecords = [];
     let browseAllLoaded = false;
 
-    // Load all records when Browse All tab is clicked
-    $(document).ready(function() {
-        $('#BrowseAll-tab').on('shown.bs.tab', function() {
-            if (!browseAllLoaded) {
-                loadAllRecords();
-            }
-        });
+    // Load all records when Browse All tab is clicked - using vanilla JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        const browseAllTab = document.getElementById('BrowseAll-tab');
+        if (browseAllTab) {
+            browseAllTab.addEventListener('click', function() {
+                if (!browseAllLoaded) {
+                    loadAllRecords();
+                }
+            });
+        }
     });
 
     function loadAllRecords() {
+        console.log('Loading all records...');
         document.getElementById('browse-loading').style.display = 'block';
         document.getElementById('browse-grid').innerHTML = '';
         
         fetch('/browse_all')
             .then(response => response.json())
             .then(data => {
+                console.log('Received data:', data);
                 document.getElementById('browse-loading').style.display = 'none';
                 
                 if (data.error) {
@@ -845,18 +850,25 @@ function searchItem() {
                     return;
                 }
                 
+                if (!data.records || data.records.length === 0) {
+                    document.getElementById('browse-grid').innerHTML = '<p>No records found.</p>';
+                    return;
+                }
+                
                 allRecords = data.records;
+                console.log('Total records loaded:', allRecords.length);
                 displayBrowseGrid();
                 browseAllLoaded = true;
             })
             .catch(error => {
+                console.error('Fetch error:', error);
                 document.getElementById('browse-loading').style.display = 'none';
                 document.getElementById('browse-grid').innerHTML = '<p>Error loading records.</p>';
-                console.error('Error:', error);
             });
     }
 
     function displayBrowseGrid() {
+        console.log('Displaying browse grid with', allRecords.length, 'records');
         const gridContainer = document.getElementById('browse-grid');
         gridContainer.innerHTML = '';
         
@@ -871,9 +883,12 @@ function searchItem() {
             
             gridContainer.appendChild(card);
         });
+        
+        console.log('Grid display completed');
     }
 
     function showRecordDetail(record) {
+        console.log('Showing detail for:', record['Sialic acid analogues']);
         const detailContent = document.getElementById('browse-detail-content');
         
         // Create the same format as search results
