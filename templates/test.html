@@ -932,6 +932,185 @@ function searchItem() {
         document.getElementById('browse-detail-container').style.display = 'none';
         document.getElementById('browse-grid-container').style.display = 'block';
     }
+
+<script>
+/* =========================
+   Browse All + Search Helpers
+   Paste this just above the jQuery <script> include
+   ========================= */
+
+function renderFieldsHtml(result) {
+    let fieldsHtml = "";
+    // show all keys except 'Image' (image is handled separately)
+    for (const [key, value] of Object.entries(result)) {
+        if (key === "Image") continue;
+        // Skip showing internal undefined values
+        const displayVal = (value === null || value === undefined) ? "" : value;
+        // avoid printing huge JSON for big objects; use simple text
+        fieldsHtml += `<p><strong>${key}:</strong> ${String(displayVal)}</p>`;
+    }
+    return fieldsHtml;
+}
+
+// SEARCH functionality (used by search bar and by card-click)
+function searchItem(query = null) {
+    if (!query) {
+        query = document.getElementById('search-query').value;
+        if (!query) return;
+    }
+
+    const encoded = encodeURIComponent(query);
+    fetch('/search?query=' + encoded)
+        .then(res => res.json())
+        .then(data => {
+            const resultsContainer = document.getElementById('result-container') || document.getElementById('search-results');
+            // pick whichever exists; 'result-container' is used in Search tab,
+            // 'search-results' is used inside BrowseAll tab detail area if present.
+            if (!resultsContainer) return;
+
+            resultsContainer.innerHTML = '';
+
+            if (!data.results || data.results.length === 0) {
+                resultsContainer.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            data.results.forEach(result => {
+                const card = document.createElement('div');
+                card.className = 'result card mb-3';
+                // image if provided as a URL
+                const imgHtml = result.Image ? `<img src="${result.Image}" alt="${result['Sialic acid analogues'] || 'image'}" class="compound-image card-img-top">` : '';
+
+                // structured fields
+                const fieldsHtml = renderFieldsHtml(result);
+
+                // safe download link (encode filename)
+                const filename = encodeURIComponent(result['Sialic acid analogues'] || '');
+                const downloadLink = `/download/${filename}.mol`;
+
+                card.innerHTML = `
+                    ${imgHtml}
+                    <div class="card-body">
+                        <h5 class="card-title">${result['Sialic acid analogues'] || ''}</h5>
+                        ${fieldsHtml}
+                        <a href="${downloadLink}" class="download-btn">Download .mol file</a>
+                    </div>
+                `;
+
+                resultsContainer.appendChild(card);
+            });
+        })
+        .catch(err => {
+            console.error('Search error:', err);
+            const resultsContainer = document.getElementById('result-container') || document.getElementById('search-results');
+            if (resultsContainer) resultsContainer.innerHTML = '<p>Error fetching results.</p>';
+        });
+}
+
+/* =========================
+   Browse All logic (cards + detail pane)
+   Uses /all_names and /search endpoints
+   ========================= */
+
+function loadBrowseGrid() {
+    // UI: show loader
+    const loadingEl = document.getElementById('browse-loading');
+    const grid = document.getElementById('browse-grid');
+    loadingEl.style.display = 'block';
+    grid.innerHTML = '';
+
+    fetch('/all_names')
+      .then(r => r.json())
+      .then(data => {
+        loadingEl.style.display = 'none';
+
+        if (data.error) {
+            grid.innerHTML = '<p>Error: ' + data.error + '</p>';
+            return;
+        }
+        if (!data.names || data.names.length === 0) {
+            grid.innerHTML = '<p>No records found.</p>';
+            return;
+        }
+
+        // Create card for each name
+        data.names.forEach(name => {
+            const card = document.createElement('div');
+            card.className = 'browse-card';
+            card.style.cursor = 'pointer';
+            card.innerHTML = `<h5>${name}</h5>`;
+            card.onclick = () => showBrowseDetail(name);
+            grid.appendChild(card);
+        });
+      })
+      .catch(err => {
+        loadingEl.style.display = 'none';
+        console.error('Error fetching all names:', err);
+        grid.innerHTML = '<p>Error loading records.</p>';
+      });
+}
+
+function showBrowseDetail(name) {
+    // get full record using existing /search route
+    fetch('/search?query=' + encodeURIComponent(name))
+      .then(r => r.json())
+      .then(data => {
+        if (!data.results || data.results.length === 0) {
+            alert('No details found for ' + name);
+            return;
+        }
+
+        const detailContainer = document.getElementById('browse-detail-content');
+        detailContainer.innerHTML = '';
+
+        data.results.forEach(result => {
+            const card = document.createElement('div');
+            card.className = 'result card';
+
+            const imgHtml = result.Image ? `<img src="${result.Image}" alt="${result['Sialic acid analogues'] || 'image'}" class="compound-image card-img-top">` : '';
+            const fieldsHtml = renderFieldsHtml(result);
+            const filename = encodeURIComponent(result['Sialic acid analogues'] || '');
+            const downloadLink = `/download/${filename}.mol`;
+
+            card.innerHTML = `
+                ${imgHtml}
+                <div class="card-body">
+                    <h5 class="card-title">${result['Sialic acid analogues'] || ''}</h5>
+                    ${fieldsHtml}
+                    <a href="${downloadLink}" class="download-btn">Download .mol file</a>
+                </div>
+            `;
+
+            detailContainer.appendChild(card);
+        });
+
+        // show detail, hide grid
+        document.getElementById('browse-grid-container').style.display = 'none';
+        document.getElementById('browse-detail-container').style.display = 'block';
+      })
+      .catch(err => {
+        console.error('Error loading details for', name, err);
+        alert('Error loading details.');
+      });
+}
+
+function showBrowseGrid() {
+    // hide detail and show grid
+    document.getElementById('browse-detail-container').style.display = 'none';
+    document.getElementById('browse-grid-container').style.display = 'block';
+}
+
+// Attach load to the Browse All tab click (only set up if element exists)
+document.addEventListener('DOMContentLoaded', () => {
+    const browseTab = document.getElementById('BrowseAll-tab');
+    if (browseTab) {
+        browseTab.addEventListener('click', () => {
+            // small delay ensures tab content is visible
+            setTimeout(loadBrowseGrid, 100);
+        });
+    }
+});
+
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
