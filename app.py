@@ -16,20 +16,19 @@ df = pd.read_excel(data_file)
 
 # --- Utility: Get image path (returns a URL for the frontend) ---
 def get_image_path(compound_name):
-    # file name on disk
     filename = f"{compound_name}.PNG"
     fs_path = os.path.join(IMAGE_DIR, filename)
-    # if image exists on disk return the static URL, else None
     if os.path.exists(fs_path):
         return url_for('static', filename=f"compound_images/{filename}")
     return None
 
-
 # --- Routes ---
+
 @app.route("/")
 def index():
     return render_template("test.html")
 
+# Suggestions for autocomplete
 @app.route("/suggestions", methods=["GET"])
 def suggestions():
     query = request.args.get("query")
@@ -41,13 +40,13 @@ def suggestions():
     suggestions_list = suggestions["Sialic acid analogues"].tolist()
     return jsonify({"suggestions": suggestions_list})
 
+# Search route
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("query")
     if not query:
         return jsonify({"results": [], "suggestions": []})
 
-    print(f"Search Query: {query}")
     query = query.strip().lower()
 
     try:
@@ -65,16 +64,15 @@ def search():
     suggestions = [result["Sialic acid analogues"] for result in results_dict]
     return jsonify({"results": results_dict, "suggestions": suggestions})
 
-# --- Download MOL file route ---
+# Download MOL file
 @app.route("/download/<filename>")
 def download_file(filename):
-    # Ensure safe path join for cloud deployment
     file_path = os.path.join(DOWNLOAD_DIR, filename)
     if not os.path.exists(file_path):
         return jsonify({"error": "File not found"}), 404
     return send_file(file_path, as_attachment=True)
 
-# --- Browse All route ---
+# Browse All (HTML page)
 @app.route("/browse_all", methods=["GET"])
 def browse_all():
     try:
@@ -84,7 +82,16 @@ def browse_all():
     except Exception as e:
         return f"Error fetching records: {e}"
 
-# --- Email Config (from environment variables) ---
+# Browse All (JSON for DataTables)
+@app.route("/browse_all_json", methods=["GET"])
+def browse_all_json():
+    try:
+        data = df[["Sialic acid analogues"]].dropna().to_dict(orient="records")
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Email configuration (from environment variables)
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SMTP_USERNAME = os.getenv("SMTP_USERNAME")
@@ -113,16 +120,15 @@ def send_email(question):
         server.login(SMTP_USERNAME, SMTP_PASSWORD)
         server.sendmail(from_email, to_email, email_message)
 
+# API to get all names (for autocomplete)
 @app.route("/all_names", methods=["GET"])
 def all_names():
     try:
-        # Use the column name you already use: "Sialic acid analogues"
         names = df["Sialic acid analogues"].dropna().astype(str).unique().tolist()
         return jsonify({"names": names})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
+# --- Run App ---
 if __name__ == "__main__":
     app.run(debug=True)
