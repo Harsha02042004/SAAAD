@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, send_file
+from flask import Flask, request, jsonify, render_template, send_file, url_for
 import pandas as pd
 import smtplib
 import os
@@ -14,10 +14,16 @@ DOWNLOAD_DIR = os.path.join(BASE_DIR, "sialic acid analog")  # folder in root
 data_file = os.path.join(BASE_DIR, "descriptions.xlsx")  # file in root
 df = pd.read_excel(data_file)
 
-# --- Utility: Get image path ---
+# --- Utility: Get image path (returns a URL for the frontend) ---
 def get_image_path(compound_name):
-    image_path = os.path.join(IMAGE_DIR, f"{compound_name}.PNG")
-    return image_path if os.path.exists(image_path) else None
+    # file name on disk
+    filename = f"{compound_name}.PNG"
+    fs_path = os.path.join(IMAGE_DIR, filename)
+    # if image exists on disk return the static URL, else None
+    if os.path.exists(fs_path):
+        return url_for('static', filename=f"compound_images/{filename}")
+    return None
+
 
 # --- Routes ---
 @app.route("/")
@@ -121,10 +127,12 @@ def send_email(question):
 @app.route("/all_names", methods=["GET"])
 def all_names():
     try:
-        names = df["Sialic acid analogues"].dropna().unique().tolist()
+        # Use the column name you already use: "Sialic acid analogues"
+        names = df["Sialic acid analogues"].dropna().astype(str).unique().tolist()
         return jsonify({"names": names})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 if __name__ == "__main__":
