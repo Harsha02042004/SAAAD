@@ -531,11 +531,7 @@ textarea {
       </tr>
     </thead>
     <tbody>
-      {% for record in records %}
-      <tr>
-        <td>{{ record['Sialic acid analogues'] }}</td>
-      </tr>
-      {% endfor %}
+      <!-- AJAX will populate -->
     </tbody>
   </table>
 </div>
@@ -783,27 +779,19 @@ textarea {
 
 <script>
 $(document).ready(function() {
-    const browseTable = $('#browse-table');
-    if (browseTable.length) {
-        fetch('/browse_all')
-            .then(res => res.json())
-            .then(data => {
-                const tbody = browseTable.find('tbody');
-                data.forEach(item => {
-                    const row = `<tr>
-                        <td>${item['Sialic acid analogues']}</td>
-                    </tr>`;
-                    tbody.append(row);
-                });
-
-                browseTable.DataTable({
-                    pageLength: 10,
-                    lengthChange: false,
-                    searching: true,
-                    ordering: true
-                });
-            })
-            .catch(err => console.error('Error fetching browse data:', err));
-    }
+    $('#browse-table').DataTable({
+        ajax: {
+            url: '/browse_all_json',   // Flask route
+            dataSrc: ''                 // DataTables expects an array at the root
+        },
+        columns: [
+            { data: 'Sialic acid analogues' }
+        ],
+        pageLength: 10,
+        lengthChange: false,
+        searching: true,
+        ordering: true
+    });
 });
 </script>
+
