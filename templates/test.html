@@ -520,24 +520,25 @@ textarea {
 			<br><b>Note </b>: A space after the comma is madatory while using mutliple keywords and a maximum keywords are acceptable.</p>
         </div>
 
-	<div class="tab-pane fade" id="Browse" role="tabpanel" aria-labelledby="Browse-tab">
-    <br>
-    <h2><center>Browse All Sialic Acid Analogues</center></h2>
-    <br>
-    <table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for record in records %}
-    <tr>
-      <td>{{ record['Sialic acid analogues'] }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="tab-pane fade" id="Browse" role="tabpanel" aria-labelledby="Browse-tab">
+  <br>
+  <h2><center>Browse All Sialic Acid Analogues</center></h2>
+  <br>
+  <table id="browse-table" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in records %}
+      <tr>
+        <td>{{ record['Sialic acid analogues'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 		
      <div class="tab-pane fade" id="Statistics" role="tabpanel" aria-labelledby="Statistics-tab">
