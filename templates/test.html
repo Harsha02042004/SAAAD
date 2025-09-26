@@ -423,6 +423,11 @@ textarea {
                     <a class="nav-link" id="Search-tab" data-toggle="tab" href="#Search" role="tab"
                         aria-controls="Search" aria-selected="false">Search</a>
                 </li>
+				<li class="nav-item">
+   					 <a class="nav-link" id="Browse-tab" data-toggle="tab" href="#Browse" role="tab"
+        				aria-controls="Browse" aria-selected="false">Browse All</a>
+				</li>
+
                 <li class="nav-item">
                     <a class="nav-link" id="Tutorial-tab" data-toggle="tab" href="#Tutorial" role="tab"
                         aria-controls="Tutorial" aria-selected="false">Tutorial</a>
@@ -514,6 +519,25 @@ textarea {
 			<p><br>User can also search using mutiple keywords by separated values. <br>Eg. "glycoloylneuraminic, trifluoroacetyl"
 			<br><b>Note </b>: A space after the comma is madatory while using mutliple keywords and a maximum keywords are acceptable.</p>
         </div>
+
+	<div class="tab-pane fade" id="Browse" role="tabpanel" aria-labelledby="Browse-tab">
+    <br>
+    <h2><center>Browse All Sialic Acid Analogues</center></h2>
+    <br>
+    <div class="container">
+        <table id="browse-table" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                                    </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be loaded dynamically -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
 		
      <div class="tab-pane fade" id="Statistics" role="tabpanel" aria-labelledby="Statistics-tab">
     <br>
@@ -664,89 +688,120 @@ textarea {
     </div>
 
 
-    <!-- Scripts -->
-    <script>
-        function fetchSuggestions() {
-            const query = document.getElementById('search-query').value;
-            const suggestionsContainer = document.getElementById('suggestions');
-            if (query.length > 0) {
-                fetch('/suggestions?query=' + encodeURIComponent(query))
-                    .then(res => res.json())
-                    .then(data => {
-                        suggestionsContainer.innerHTML = '';
-                        data.suggestions.forEach(s => {
-                            const div = document.createElement('div');
-                            div.textContent = s;
-                            div.onclick = () => selectSuggestion(s);
-                            suggestionsContainer.appendChild(div);
-                        });
-                        suggestionsContainer.style.display = 'block';
-                        document.querySelector('.clear-btn').style.display = 'block';
+<!-- ==========================
+     Search & Suggestions
+========================== -->
+<script>
+    function fetchSuggestions() {
+        const query = document.getElementById('search-query').value;
+        const suggestionsContainer = document.getElementById('suggestions');
+        if (query.length > 0) {
+            fetch('/suggestions?query=' + encodeURIComponent(query))
+                .then(res => res.json())
+                .then(data => {
+                    suggestionsContainer.innerHTML = '';
+                    data.suggestions.forEach(s => {
+                        const div = document.createElement('div');
+                        div.textContent = s;
+                        div.onclick = () => selectSuggestion(s);
+                        suggestionsContainer.appendChild(div);
                     });
-            } else {
-                clearSearch();
-            }
+                    suggestionsContainer.style.display = 'block';
+                    document.querySelector('.clear-btn').style.display = 'block';
+                });
+        } else {
+            clearSearch();
         }
+    }
 
-        function selectSuggestion(suggestion) {
-            document.getElementById('search-query').value = suggestion;
-            document.getElementById('suggestions').style.display = 'none';
-            document.querySelector('.clear-btn').style.display = 'block';
-        }
+    function selectSuggestion(suggestion) {
+        document.getElementById('search-query').value = suggestion;
+        document.getElementById('suggestions').style.display = 'none';
+        document.querySelector('.clear-btn').style.display = 'block';
+    }
 
-        function clearSearch() {
-            document.getElementById('search-query').value = '';
-            document.getElementById('suggestions').style.display = 'none';
-            document.querySelector('.clear-btn').style.display = 'none';
-            document.getElementById('result-container').innerHTML = '';
-        }
+    function clearSearch() {
+        document.getElementById('search-query').value = '';
+        document.getElementById('suggestions').style.display = 'none';
+        document.querySelector('.clear-btn').style.display = 'none';
+        document.getElementById('result-container').innerHTML = '';
+    }
 
-function searchItem() {
-    const query = document.getElementById('search-query').value;
-    if (!query) return;
+    function searchItem() {
+        const query = document.getElementById('search-query').value;
+        if (!query) return;
 
-    fetch('/search?query=' + encodeURIComponent(query))
-        .then(res => res.json())
-        .then(data => {
-            const resultsContainer = document.getElementById('result-container');
-            resultsContainer.innerHTML = '';
+        fetch('/search?query=' + encodeURIComponent(query))
+            .then(res => res.json())
+            .then(data => {
+                const resultsContainer = document.getElementById('result-container');
+                resultsContainer.innerHTML = '';
 
-            if (!data.results || data.results.length === 0) {
-                resultsContainer.innerHTML = '<p>No results found.</p>';
-                return;
-            }
+                if (!data.results || data.results.length === 0) {
+                    resultsContainer.innerHTML = '<p>No results found.</p>';
+                    return;
+                }
 
-            data.results.forEach(result => {
-                const resultDiv = document.createElement('div');
-                resultDiv.classList.add('result');
-                resultDiv.innerHTML = `
-                    <h3>${result['Sialic acid analogues']}${result['Image'] ? `<img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compound-image">` : ''}</h3>
-                    <p><strong>SMILES:</strong> ${result['SMILES'] || ''}</p>
-                    <p><strong>Formula:</strong> ${result['Formula'] || ''}</p>
-                    <p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol'] || ''}</p>
-                    <p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors'] || ''}</p>
-                    <p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors'] || ''}</p>
-                    <p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)'] || ''}</p>
-                    <p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3'] || ''}</p>
-                    <p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)'] || ''}</p>
-                    <p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)'] || ''}</p>
-                    <p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)'] || ''}</p>
-                    <p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w'] || ''}</p>
-                    <a href="/download/${result['Sialic acid analogues']}.mol" download class="download-btn">Download .mol file</a>
-                `;
-                resultsContainer.appendChild(resultDiv);
+                data.results.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.classList.add('result');
+                    resultDiv.innerHTML = `
+                        <h3>${result['Sialic acid analogues']}${result['Image'] ? `<img src="${result['Image']}" alt="${result['Sialic acid analogues']} image" class="compound-image">` : ''}</h3>
+                        <p><strong>SMILES:</strong> ${result['SMILES'] || ''}</p>
+                        <p><strong>Formula:</strong> ${result['Formula'] || ''}</p>
+                        <p><strong>Molecular Weight:</strong> ${result['Molecular weight/g/mol'] || ''}</p>
+                        <p><strong>Num. H-bond Acceptors:</strong> ${result['Num. H-bond acceptors'] || ''}</p>
+                        <p><strong>Num. H-bond Donors:</strong> ${result['Num. H-bond donors'] || ''}</p>
+                        <p><strong>Log Po/w (iLOGP):</strong> ${result['Log Po/w (iLOGP)'] || ''}</p>
+                        <p><strong>Log Po/w (XLOGP3):</strong> ${result['Log Po/w (XLOGP3'] || ''}</p>
+                        <p><strong>Log Po/w (WLOGP):</strong> ${result['Log Po/w (WLOGP)'] || ''}</p>
+                        <p><strong>Log Po/w (MLOGP):</strong> ${result['Log Po/w (MLOGP)'] || ''}</p>
+                        <p><strong>Log Po/w (SILICOS-IT):</strong> ${result['Log Po/w (SILICOS-IT)'] || ''}</p>
+                        <p><strong>Consensus Log Po/w:</strong> ${result['Consensus Log Po/w'] || ''}</p>
+                        <a href="/download/${result['Sialic acid analogues']}.mol" download class="download-btn">Download .mol file</a>
+                    `;
+                    resultsContainer.appendChild(resultDiv);
+                });
+            })
+            .catch(err => {
+                console.error('Search error:', err);
+                document.getElementById('result-container').innerHTML = '<p>Error fetching results.</p>';
             });
-        })
-        .catch(err => {
-            console.error('Search error:', err);
-            document.getElementById('result-container').innerHTML = '<p>Error fetching results.</p>';
-        });
-}
-    </script>
+    }
+</script>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+<!-- ==========================
+     Browse All functionality
+========================== -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-</html>
+<script>
+$(document).ready(function() {
+    const browseTable = $('#browse-table');
+    if (browseTable.length) {
+        fetch('/browse_all')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = browseTable.find('tbody');
+                data.forEach(item => {
+                    const row = `<tr>
+                        <td>${item['Sialic acid analogues']}</td>
+                    </tr>`;
+                    tbody.append(row);
+                });
+
+                browseTable.DataTable({
+                    pageLength: 10,
+                    lengthChange: false,
+                    searching: true,
+                    ordering: true
+                });
+            })
+            .catch(err => console.error('Error fetching browse data:', err));
+    }
+});
+</script>
