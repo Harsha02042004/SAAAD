@@ -841,16 +841,22 @@ function searchItem() {
         
         fetch('/browse_all')
             .then(response => response.json())
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
             .then(data => {
                 console.log('Received data:', data);
                 document.getElementById('browse-loading').style.display = 'none';
                 
                 if (data.error) {
+                    console.error('Server error:', data.error);
                     document.getElementById('browse-grid').innerHTML = '<p>Error loading records: ' + data.error + '</p>';
                     return;
                 }
                 
                 if (!data.records || data.records.length === 0) {
+                    console.warn('No records in response');
                     document.getElementById('browse-grid').innerHTML = '<p>No records found.</p>';
                     return;
                 }
@@ -863,7 +869,7 @@ function searchItem() {
             .catch(error => {
                 console.error('Fetch error:', error);
                 document.getElementById('browse-loading').style.display = 'none';
-                document.getElementById('browse-grid').innerHTML = '<p>Error loading records.</p>';
+                document.getElementById('browse-grid').innerHTML = '<p>Error loading records: ' + error.message + '</p>';
             });
     }
 
@@ -872,7 +878,13 @@ function searchItem() {
         const gridContainer = document.getElementById('browse-grid');
         gridContainer.innerHTML = '';
         
+        if (!allRecords || allRecords.length === 0) {
+            gridContainer.innerHTML = '<p>No records to display.</p>';
+            return;
+        }
+        
         allRecords.forEach((record, index) => {
+            console.log(`Creating card for record ${index}:`, record['Sialic acid analogues']);
             const card = document.createElement('div');
             card.className = 'browse-card';
             card.onclick = () => showRecordDetail(record);
