@@ -12,7 +12,8 @@ DOWNLOAD_DIR = os.path.join(BASE_DIR, "sialic acid analog")  # folder in root
 
 # --- Load Excel dataset ---
 data_file = os.path.join(BASE_DIR, "descriptions.xlsx")  # file in root
-df = pd.read_excel(data_file)
+all_sheets = pd.read_excel(data_file, sheet_name=None)  # None = all sheets
+df = pd.concat(all_sheets.values(), ignore_index=True)
 
 # --- Utility: Get image path (returns a URL for the frontend) ---
 def get_image_path(compound_name):
