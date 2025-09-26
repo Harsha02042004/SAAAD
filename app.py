@@ -86,11 +86,20 @@ def browse_all():
 @app.route("/browse_all_json", methods=["GET"])
 def browse_all_json():
     try:
-        data = df[["Sialic acid analogues"]].dropna().to_dict(orient="records")
+        import pandas as pd
+        import os
+
+        # Read all sheets into a dict
+        all_sheets = pd.read_excel("descriptions.xlsx", sheet_name=None)  # None = all sheets
+        # Concatenate all sheets into a single DataFrame
+        combined_df = pd.concat(all_sheets.values(), ignore_index=True)
+
+        # Keep only the Sialic acid analogues column
+        data = combined_df[["Sialic acid analogues"]].dropna().to_dict(orient="records")
+
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 # Email configuration (from environment variables)
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
