@@ -78,26 +78,11 @@ def download_file(filename):
 @app.route("/browse_all", methods=["GET"])
 def browse_all():
     try:
-        print(f"DataFrame shape: {df.shape}")
-        print(f"DataFrame columns: {df.columns.tolist()}")
-
-        # Rename the column for consistency with frontend
         renamed_df = df.rename(columns={"Sialic acid analogues": "Name"})
-        
-        # Convert to records
         all_records = renamed_df.to_dict(orient="records")
-        print(f"Number of records: {len(all_records)}")
-
-        # Add image paths
-        for record in all_records:
-            record["Image"] = get_image_path(record["Name"])
-
-        print(f"Returning {len(all_records)} records")
-        return jsonify({"records": all_records})
+        return render_template("browse_all.html", records=all_records)
     except Exception as e:
-        print(f"Error in browse_all: {str(e)}")
-        return jsonify({"error": f"Error fetching records: {str(e)}"})
-
+        return f"Error fetching records: {e}"
 
 # --- Email Config (from environment variables) ---
 SMTP_SERVER = "smtp.gmail.com"
