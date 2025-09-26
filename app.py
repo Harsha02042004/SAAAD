@@ -118,5 +118,14 @@ def send_email(question):
         server.login(SMTP_USERNAME, SMTP_PASSWORD)
         server.sendmail(from_email, to_email, email_message)
 
+@app.route("/all_names", methods=["GET"])
+def all_names():
+    try:
+        names = df["Sialic acid analogues"].dropna().unique().tolist()
+        return jsonify({"names": names})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)
