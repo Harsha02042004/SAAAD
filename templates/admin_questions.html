@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Questions</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .admin-header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .question-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .question-text {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-pending {
+            background-color: #ffc107;
+            color: #856404;
+        }
+        .status-answered {
+            background-color: #28a745;
+            color: white;
+        }
+        .answer-form {
+            margin-top: 15px;
+        }
+        .existing-answer {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="container">
+            <h1>Admin Panel - Manage Questions</h1>
+            <p>Review and answer user questions</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>User Questions ({{ questions|length }} total)</h3>
+                
+                {% if questions %}
+                    {% for question in questions %}
+                    <div class="question-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5>Question #{{ question[0] }}</h5>
+                            <span class="status-badge {% if question[5] == 'answered' %}status-answered{% else %}status-pending{% endif %}">
+                                {{ question[5].title() }}
+                            </span>
+                        </div>
+                        
+                        <div class="question-text">
+                            <strong>Question:</strong><br>
+                            {{ question[1] }}
+                        </div>
+                        
+                        <small class="text-muted">
+                            Submitted: {{ question[3] }}
+                            {% if question[4] %}
+                                | Answered: {{ question[4] }}
+                            {% endif %}
+                        </small>
+                        
+                        {% if question[2] %}
+                            <div class="existing-answer">
+                                <strong>Current Answer:</strong><br>
+                                {{ question[2] }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="answer-form">
+                            <form onsubmit="submitAnswer(event, {{ question[0] }})">
+                                <div class="form-group">
+                                    <label for="answer-{{ question[0] }}">
+                                        {% if question[2] %}Update Answer:{% else %}Provide Answer:{% endif %}
+                                    </label>
+                                    <textarea 
+                                        class="form-control" 
+                                        id="answer-{{ question[0] }}" 
+                                        name="answer" 
+                                        rows="3" 
+                                        placeholder="Type your answer here..."
+                                        required>{{ question[2] or '' }}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    {% if question[2] %}Update Answer{% else %}Submit Answer{% endif %}
+                                </button>
+                            </form>
+                            <div id="status-{{ question[0] }}" style="margin-top: 10px; display: none;"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <h4>No Questions Yet</h4>
+                        <p>No questions have been submitted yet. Questions will appear here when users submit them through the FAQ page.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+    function submitAnswer(event, questionId) {
+        event.preventDefault();
+        
+        const answer = document.getElementById(`answer-${questionId}`).value.trim();
+        const statusDiv = document.getElementById(`status-${questionId}`);
+        
+        if (!answer) {
+            statusDiv.innerHTML = '<p style="color: red;">Please enter an answer.</p>';
+            statusDiv.style.display = 'block';
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('question_id', questionId);
+        formData.append('answer', answer);
+        
+        fetch('/admin/answer', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                statusDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
+                // Reload page after 2 seconds to show updated status
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                statusDiv.innerHTML = `<p style="color: red;">${data.error || 'Failed to submit answer'}</p>`;
+            }
+            statusDiv.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error submitting answer:', error);
+            statusDiv.innerHTML = '<p style="color: red;">Error submitting answer. Please try again.</p>';
+            statusDiv.style.display = 'block';
+        });
+    }
+    </script>
+</body>
+</html>

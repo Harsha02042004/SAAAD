@@ -771,6 +771,97 @@ textarea {
 <!-- ==========================
      Browse All functionality
 ========================== -->
+
+<!-- ==========================
+     FAQ Q&A functionality
+========================== -->
+<script>
+// Load Q&A when FAQ tab is shown
+document.addEventListener('DOMContentLoaded', function() {
+    // Load Q&A when FAQ tab is clicked
+    document.getElementById('FAQ-tab').addEventListener('click', function() {
+        loadQA();
+    });
+    
+    // Handle question form submission
+    document.getElementById('question-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitQuestion();
+    });
+});
+
+function loadQA() {
+    fetch('/get_qa')
+        .then(response => response.json())
+        .then(data => {
+            const qaContainer = document.getElementById('qa-container');
+            
+            if (data.qa_list && data.qa_list.length > 0) {
+                let qaHTML = '';
+                data.qa_list.forEach(qa => {
+                    qaHTML += `
+                        <div class="faq-item">
+                            <h5 class="faq-question">${qa.question}</h5>
+                            <p class="faq-answer" style="display: block; color: #2c5530; font-style: italic;">
+                                <strong>Answer:</strong> ${qa.answer}
+                            </p>
+                            <small style="color: #666;">
+                                Asked: ${new Date(qa.submitted_at).toLocaleDateString()} | 
+                                Answered: ${new Date(qa.answered_at).toLocaleDateString()}
+                            </small>
+                        </div>
+                    `;
+                });
+                qaContainer.innerHTML = qaHTML;
+            } else {
+                qaContainer.innerHTML = '<p style="text-align: center; color: #666;">No answered questions yet. Be the first to ask!</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading Q&A:', error);
+            document.getElementById('qa-container').innerHTML = '<p style="color: red;">Error loading questions and answers.</p>';
+        });
+}
+
+function submitQuestion() {
+    const question = document.getElementById('user-question').value.trim();
+    const statusDiv = document.getElementById('question-status');
+    
+    if (!question) {
+        statusDiv.innerHTML = '<p style="color: red;">Please enter a question.</p>';
+        statusDiv.style.display = 'block';
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('user_question', question);
+    
+    fetch('/submit_question', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            statusDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
+            document.getElementById('user-question').value = '';
+        } else {
+            statusDiv.innerHTML = `<p style="color: red;">${data.error || 'Failed to submit question'}</p>`;
+        }
+        statusDiv.style.display = 'block';
+        
+        // Hide status message after 5 seconds
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+    })
+    .catch(error => {
+        console.error('Error submitting question:', error);
+        statusDiv.innerHTML = '<p style="color: red;">Error submitting question. Please try again.</p>';
+        statusDiv.style.display = 'block';
+    });
+}
+</script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>

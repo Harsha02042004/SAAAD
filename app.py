@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, render_template, send_file, url_for
 import pandas as pd
 import smtplib
 import os
+import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -15,6 +17,25 @@ data_file = os.path.join(BASE_DIR, "descriptions.xlsx")  # file in root
 all_sheets = pd.read_excel(data_file, sheet_name=None)  # None = all sheets
 df = pd.concat(all_sheets.values(), ignore_index=True)
 
+# --- Database Setup ---
+def init_db():
+    conn = sqlite3.connect('qa_database.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question TEXT NOT NULL,
+            answer TEXT,
+            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            answered_at TIMESTAMP,
+            status TEXT DEFAULT 'pending'
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+# Initialize database on startup
+init_db()
 # --- Utility: Get image path (returns a URL for the frontend) ---
 def get_image_path(compound_name):
     filename = f"{compound_name}.PNG"
@@ -109,13 +130,35 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 TO_EMAIL = os.getenv("TO_EMAIL", "example@example.com")  # fallback if not set
 
 @app.route("/submit_question", methods=["POST"])
-def ask_question():
+def submit_question():
     question = request.form.get("user_question")
     if not question:
         return jsonify({"error": "No question provided"}), 400
 
-    send_email(question)
-    return jsonify({"message": "Question sent successfully!"})
+    try:
+        # Store question in database
+        conn = sqlite3.connect('qa_database.db')
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO questions (question) VALUES (?)",
+            (question,)
+        )
+        conn.commit()
+        question_id = cursor.lastrowid
+        conn.close()
+        
+        # Also send email notification
+        try:
+            send_email(question)
+        except Exception as e:
+            print(f"Email sending failed: {e}")
+        
+        return jsonify({
+            "message": "Question submitted successfully! You can check back later for the answer.",
+            "question_id": question_id
+        })
+    except Exception as e:
+        return jsonify({"error": f"Failed to submit question: {str(e)}"}), 500
 
 def send_email(question):
     from_email = SMTP_USERNAME
@@ -139,6 +182,77 @@ def all_names():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Get all Q&A for display
+@app.route("/get_qa", methods=["GET"])
+def get_qa():
+    try:
+        conn = sqlite3.connect('qa_database.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, question, answer, submitted_at, answered_at, status 
+            FROM questions 
+            WHERE status = 'answered' 
+            ORDER BY answered_at DESC
+        """)
+        questions = cursor.fetchall()
+        conn.close()
+        
+        qa_list = []
+        for q in questions:
+            qa_list.append({
+                'id': q[0],
+                'question': q[1],
+                'answer': q[2],
+                'submitted_at': q[3],
+                'answered_at': q[4],
+                'status': q[5]
+            })
+        
+        return jsonify({"qa_list": qa_list})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Admin route to answer questions
+@app.route("/admin/questions", methods=["GET"])
+def admin_questions():
+    try:
+        conn = sqlite3.connect('qa_database.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, question, answer, submitted_at, answered_at, status 
+            FROM questions 
+            ORDER BY submitted_at DESC
+        """)
+        questions = cursor.fetchall()
+        conn.close()
+        
+        return render_template("admin_questions.html", questions=questions)
+    except Exception as e:
+        return f"Error fetching questions: {e}"
+
+# Admin route to submit answers
+@app.route("/admin/answer", methods=["POST"])
+def submit_answer():
+    question_id = request.form.get("question_id")
+    answer = request.form.get("answer")
+    
+    if not question_id or not answer:
+        return jsonify({"error": "Question ID and answer are required"}), 400
+    
+    try:
+        conn = sqlite3.connect('qa_database.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE questions 
+            SET answer = ?, answered_at = ?, status = 'answered'
+            WHERE id = ?
+        """, (answer, datetime.now(), question_id))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({"message": "Answer submitted successfully!"})
+    except Exception as e:
+        return jsonify({"error": f"Failed to submit answer: {str(e)}"}), 500
 # --- Run App ---
 if __name__ == "__main__":
     app.run(debug=True)
